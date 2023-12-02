@@ -50,6 +50,7 @@ from collections import defaultdict
 import re
 from django.db import connection
 from django.views.decorators.csrf import csrf_exempt
+from .models import purchaseorder
 
 
 def index(request):
@@ -51402,3 +51403,10 @@ def paymentDraftToSave(request, id):
         pay.save()
         return redirect(payment_view, id)
 
+
+# Harikrishnan -start-------------------------------------------------
+
+def purchase_order_details(request):
+    cmp1 = company.objects.get(id=request.user)
+    details = purchaseorder.objects.all()
+    return render(request,'app1/purchase_order_details.html',{'details':details,'cmp1':cmp1})
