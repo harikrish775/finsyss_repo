@@ -4,8 +4,6 @@
 {% if user.is_authenticated %}
 <!-- Include jQuery -->
 <!-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> -->
-<script src="https://cdn.emailjs.com/dist/email.min.js"></script>
-
 
 
 <!-- Include jQuery.table2excel plugin -->
@@ -76,7 +74,7 @@
             <div class="card-title">
                 <center>
                     <h6>{{cmp1.cname}}</h6>
-                    <h2 class="mb-0">PURCHASE ORDER DETAILS</h2>
+                    <h2 class="mb-0">PURCHASE ORDER BY VENDOR</h2>
                     <div class="display">
                         <div id="d1" style="display: inline-block;"></div>
                         <div id="d2" style="display: inline-block;"></div>
@@ -106,14 +104,17 @@
             </div>
             <div class="bar pt-4 px-2">
                 <div class="left ">
-                    <a class="btn btn-outline-info" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
-                        role="button"><i class="fa fa-filter"></i> Filter By
-                    </a>
+                    <label for="">Filter By Vendor</label><br>
+                    <input type="search" placeholder="Enter Vendor Name" class="btn btn-outline-info" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" role="searchbox">
+                    
                     <div class="dropdown-menu">
-                        <a class="dropdown-item" onclick="filterTable('All')">All</a>
-                        <a class="dropdown-item" onclick="filterTable('With')">with GSTIN</a>
-                        <a class="dropdown-item" onclick="filterTable('Without')">without GSTIN</a>
+                        {% for i in vendor %}
+                        <a class="dropdown-item" onclick="filterTable('{{i.vendorid}}')">{{i.firstname}}{{i.lastname}}</a>
+                        {% endfor %}
                     </div>
+
+                   
+                    
                 </div>
                 <div class="right">
 
@@ -124,8 +125,8 @@
                         Share
                     </button>
                     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                        <button class="dropdown-item" onclick="shareViaWhatsApp()">Whatsapp</button>
-                        <a class="dropdown-item" href="" >Email</a>
+                        <a class="dropdown-item" onclick="shareViaWhatsApp()">Whatsapp</a>
+                        <a class="dropdown-item" href="#">Email</a>
                         
                     </div>
                     
@@ -135,10 +136,10 @@
         </div>
     </div>
     <script>
-        
 
         $(document).ready(function ($) {
             
+
             $(document).on('click', '.btn_pdf', function (event) {
                 console.log('print1');
                 event.preventDefault();
@@ -148,7 +149,7 @@
                 var opt =
                 {
                     margin: 1,
-                    filename: 'purchase_order_details' + '.pdf',
+                    filename: 'gstr2' + '.pdf',
                     image: { type: 'png', quality: 1.0 },
                     html2canvas: { scale: 3, useCORS: true, backgroundColor: null },
                     jsPDF: { unit: 'in', format: 'a3', orientation: 'portrait' }
@@ -158,9 +159,8 @@
             });
 
         });
-                        
-                
-                function shareViaWhatsApp() {
+
+        function shareViaWhatsApp() {
                     // Collect data from the table or any other relevant information
                     var tableData = getTableData(); // Implement the function to fetch table data
 
@@ -173,7 +173,6 @@
                     // Open the link in a new tab or window
                     window.open(whatsappLink, "_blank");
                 }
-
                 function getTableData() {
                     // Implement this function to fetch and format your table data
                     // You can iterate through the table rows and cells to collect the necessary information
@@ -288,12 +287,11 @@
                             </th>
                         </tr>
                         <tr>
-                            <th style="text-align: center;">Date</th>
-                            <th style="text-align: center;">Number </th>
-                            <th style="text-align: center;">Due Date</th>
                             <th style="text-align: center;">Vendor Name</th>
-                            <th style="text-align: center;">Status</th>
-                            <th style="text-align: center;">Amount</th>
+                            <th style="text-align: center;">Mail ID </th>
+                            <th style="text-align: center;">Purchase Order Count(Total Count)</th>
+                            <th style="text-align: center;">Amount( Total Amount)</th>
+                            
 
                         </tr>
                     </thead>
@@ -304,13 +302,11 @@
                             <td>{{i.account_number}}</td>
                             <td>{{i.due_date}}</td>
                             <td>{{i.vendor_name}}</td>
-                            <td>{% if i.status == 'Billed' %}Converted to Bill{% endif %}</td>
-                            <td>{{i.}}</td>
+                            
                         </tr>
                         {% endfor %}
-                        
+                        Purchse Order Count : 
                     </tbody>
-                    Purchse Order Count : 
                 </table>
                 <br>
 

@@ -50,7 +50,7 @@ from collections import defaultdict
 import re
 from django.db import connection
 from django.views.decorators.csrf import csrf_exempt
-from .models import purchaseorder
+from .models import purchaseorder,vendor
 
 
 def index(request):
@@ -51404,9 +51404,19 @@ def paymentDraftToSave(request, id):
         return redirect(payment_view, id)
 
 
-# Harikrishnan -start-------------------------------------------------
+# Harikrishnan --------------------------------------------------
 
 def purchase_order_details(request):
     cmp1 = company.objects.get(id=request.user)
     details = purchaseorder.objects.all()
     return render(request,'app1/purchase_order_details.html',{'details':details,'cmp1':cmp1})
+
+def purchase_orderby_vendor(request):
+    cmp1 = company.objects.get(id=request.user)
+    vendo = vendor.objects.all()
+    return render(request,'app1/purchase_orderby_vendor.html',{'cmp1':cmp1,'vendor':vendo})
+
+def recurring_bill_details(request):
+    cmp1 = company.objects.get(id=request.user)
+    return render(request,'app1/recurring_bill_details.html',{'cmp1':cmp1})
+

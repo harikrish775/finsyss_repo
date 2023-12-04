@@ -1355,9 +1355,11 @@ urlpatterns = [
     
     path('payment_draf_to_save/<int:id>',views.paymentDraftToSave, name='paymentDraftToSave'), 
 
-    # Harikrishnan-start-------------------------------
+    # Harikrishnan-------------------------------------
 
     path('purchase_order_details',views.purchase_order_details,name='purchase_order_details'),
+    path('purchase_orderby_vendor',views.purchase_orderby_vendor,name='purchase_orderby_vendor'),
+    path('recurring_bill_details',views.recurring_bill_details,name='recurring_bill_details'),
     
  
  
