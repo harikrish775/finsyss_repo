@@ -4,8 +4,6 @@
 {% if user.is_authenticated %}
 <!-- Include jQuery -->
 <!-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> -->
-<script src="https://cdn.emailjs.com/dist/email.min.js"></script>
-
 
 
 <!-- Include jQuery.table2excel plugin -->
@@ -76,7 +74,7 @@
             <div class="card-title">
                 <center>
                     <h6>{{cmp1.cname}}</h6>
-                    <h2 class="mb-0">PURCHASE ORDER DETAILS</h2>
+                    <h2 class="mb-0"> RECURRING BILL DETAILS</h2>
                     <div class="display">
                         <div id="d1" style="display: inline-block;"></div>
                         <div id="d2" style="display: inline-block;"></div>
@@ -124,8 +122,8 @@
                         Share
                     </button>
                     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                        <button class="dropdown-item" onclick="shareViaWhatsApp()">Whatsapp</button>
-                        <a class="dropdown-item" href="" >Email</a>
+                        <a class="dropdown-item" onclick="shareViaWhatsApp()">Whatsapp</a>
+                        <a class="dropdown-item" href="#">Email</a>
                         
                     </div>
                     
@@ -135,32 +133,9 @@
         </div>
     </div>
     <script>
-        
 
-        $(document).ready(function ($) {
-            
-            $(document).on('click', '.btn_pdf', function (event) {
-                console.log('print1');
-                event.preventDefault();
-                var element = document.getElementById('pdf-card');
-                element.style.color = 'black';
-                element.style.backgroundColor = '#243e54';
-                var opt =
-                {
-                    margin: 1,
-                    filename: 'purchase_order_details' + '.pdf',
-                    image: { type: 'png', quality: 1.0 },
-                    html2canvas: { scale: 3, useCORS: true, backgroundColor: null },
-                    jsPDF: { unit: 'in', format: 'a3', orientation: 'portrait' }
-                };
-                html2pdf().set(opt).from(element).save();
 
-            });
-
-        });
-                        
-                
-                function shareViaWhatsApp() {
+function shareViaWhatsApp() {
                     // Collect data from the table or any other relevant information
                     var tableData = getTableData(); // Implement the function to fetch table data
 
@@ -173,7 +148,6 @@
                     // Open the link in a new tab or window
                     window.open(whatsappLink, "_blank");
                 }
-
                 function getTableData() {
                     // Implement this function to fetch and format your table data
                     // You can iterate through the table rows and cells to collect the necessary information
@@ -189,6 +163,31 @@
                     }
                     return data;
                 }
+
+
+
+        $(document).ready(function ($) {
+            
+
+            $(document).on('click', '.btn_pdf', function (event) {
+                console.log('print1');
+                event.preventDefault();
+                var element = document.getElementById('pdf-card');
+                element.style.color = 'black';
+                element.style.backgroundColor = '#243e54';
+                var opt =
+                {
+                    margin: 1,
+                    filename: 'gstr2' + '.pdf',
+                    image: { type: 'png', quality: 1.0 },
+                    html2canvas: { scale: 3, useCORS: true, backgroundColor: null },
+                    jsPDF: { unit: 'in', format: 'a3', orientation: 'portrait' }
+                };
+                html2pdf().set(opt).from(element).save();
+
+            });
+
+        });
 
 
         function filterTable(filterValue) {
@@ -284,16 +283,17 @@
                     style="background-color: rgba(0, 0, 0, 0.2);" id="myTable">
                     <thead>
                         <tr>
-                            <th colspan="6" style="text-align: center;">Purchase Order Details</th>
+                            <th colspan="7" style="text-align: center;">Recurring Bill Details</th>
                             </th>
                         </tr>
                         <tr>
                             <th style="text-align: center;">Date</th>
-                            <th style="text-align: center;">Number </th>
                             <th style="text-align: center;">Due Date</th>
+                            <th style="text-align: center;">Profile Name</th>
+                            <th style="text-align: center;">RB number</th>
                             <th style="text-align: center;">Vendor Name</th>
-                            <th style="text-align: center;">Status</th>
                             <th style="text-align: center;">Amount</th>
+                            <th style="text-align: center;">Balance</th>
 
                         </tr>
                     </thead>
@@ -308,9 +308,8 @@
                             <td>{{i.}}</td>
                         </tr>
                         {% endfor %}
-                        
+                        Purchse Order Count : 
                     </tbody>
-                    Purchse Order Count : 
                 </table>
                 <br>
 
