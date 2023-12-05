@@ -50,7 +50,7 @@ from collections import defaultdict
 import re
 from django.db import connection
 from django.views.decorators.csrf import csrf_exempt
-from .models import purchaseorder,vendor
+from .models import purchaseorder,vendor,recurring_bill
 
 
 def index(request):
@@ -51413,10 +51413,17 @@ def purchase_order_details(request):
 
 def purchase_orderby_vendor(request):
     cmp1 = company.objects.get(id=request.user)
-    vendo = vendor.objects.all()
-    return render(request,'app1/purchase_orderby_vendor.html',{'cmp1':cmp1,'vendor':vendo})
+    vendr = vendor.objects.all()
+    # vendordetails = purchaseorder.objects.values('vendor_name').distinct()
+    vendordetails = purchaseorder.objects.values('vendor_name').annotate(number_of_orders=Count('vendor_balance'),total_amount=Sum('grand_total'))
+    return render(request, 'app1/purchase_orderby_vendor.html', {'vendordetails': vendordetails,'vendor':vendr,'cmp1':cmp1})
 
-def recurring_bill_details(request):
+def recurring_bill_report(request):
     cmp1 = company.objects.get(id=request.user)
-    return render(request,'app1/recurring_bill_details.html',{'cmp1':cmp1})
+    recur = recurring_bill.objects.all()
+    defaultCount = recurring_bill.objects.all().count()
+    defaultAmount = 0
+    for i in recur:
+        defaultAmount += i.paid_amount
+    return render(request,'app1/recurring_bill_report.html',{'cmp1':cmp1,'recur':recur,'defaultCount':defaultCount,'defaultAmount':defaultAmount})
 

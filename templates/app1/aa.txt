@@ -1,0 +1,20 @@
+for i in vendr:
+        fullname = i.firstname
+        email = i.email
+        vendorordercount = purchaseorder.objects.filter(vendor_name=fullname).count()
+        vendororders = purchaseorder.objects.filter(vendor_name=fullname)
+        total_amount = 0
+        # for k in vendororders:
+        #     total_amount += k.grand_total
+        total_amount = sum(order.grand_total for order in vendororders)
+        # Append details to the list
+        vendordetails = {
+            'fullname': fullname,
+            'email': email,
+            'vendorordercount': vendorordercount,
+            'total_amount': total_amount,
+        }
+
+        context = {
+            'vendordetails': vendordetails,
+        }

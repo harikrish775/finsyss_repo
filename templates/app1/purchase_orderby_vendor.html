@@ -74,7 +74,7 @@
             <div class="card-title">
                 <center>
                     <h6>{{cmp1.cname}}</h6>
-                    <h2 class="mb-0">PURCHASE ORDER BY VENDOR</h2>
+                    <h2 class="mb-0">PURCHASE ORDER BY <span id="vendorName">VENDOR</span></h2>
                     <div class="display">
                         <div id="d1" style="display: inline-block;"></div>
                         <div id="d2" style="display: inline-block;"></div>
@@ -105,20 +105,23 @@
             <div class="bar pt-4 px-2">
                 <div class="left ">
                     <label for="">Filter By Vendor</label><br>
-                    <input type="search" placeholder="Enter Vendor Name" class="btn btn-outline-info" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" role="searchbox">
+                    <input type="search" class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                       
+                      </input>
                     
-                    <div class="dropdown-menu">
+                      <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                        <a class="dropdown-item" onclick="filterTable('All')">All</a>
                         {% for i in vendor %}
-                        <a class="dropdown-item" onclick="filterTable('{{i.vendorid}}')">{{i.firstname}}{{i.lastname}}</a>
+                        <a class="dropdown-item" onclick="filterTable('{{i.firstname}}')">{{i.firstname}} {{i.lastname}}</a>
                         {% endfor %}
-                    </div>
-
+                      </div>
                    
                     
                 </div>
+
                 <div class="right">
 
-                    <button class="btn btn_pdf btn-outline-info">pdf</button>
+                    <button class="btn btn_pdf btn-outline-info" id="btn_pdf">pdf</button>
                     <button class="btn btn_print btn-outline-info">Print</button>
                     <button class=" btn btn-outline-info" id="export-button" onclick="exportAsExcel()">Excel</button>
                     <button class="btn btn-outline-info dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -137,7 +140,58 @@
     </div>
     <script>
 
-        $(document).ready(function ($) {
+
+function filterTable(filterValue) {
+    const table = document.getElementById('myTable');
+    const rows = table.getElementsByTagName('tr');
+    let count = 0;
+    let totalAmount = 0;
+
+    const fromDate = new Date(document.getElementById('in1').value);
+    const toDate = new Date(document.getElementById('in2').value);
+
+    // Set the time component of toDate to the end of the day
+    toDate.setHours(23, 59, 59, 999);
+
+    for (let i = 2; i < rows.length; i++) {
+        const row = rows[i];
+        const nameCell = row.cells[0]; // Assuming name is in the first column
+        const dateCell = new Date(row.cells[1].textContent); // Assuming date is in the second column
+        const amountCell = parseFloat(row.cells[6].textContent); // Assuming amount is in the seventh column
+
+        // Set the time component of dateCell to the end of the day
+        dateCell.setHours(23, 59, 59, 999);
+
+        if (filterValue === 'All' || nameCell.textContent === filterValue) {
+            if (fromDate <= dateCell && dateCell <= toDate) {
+                count = count + 1;
+                totalAmount += amountCell;
+                row.style.display = 'table-row';
+            } else {
+                row.style.display = 'none';
+            }
+        } else {
+            row.style.display = 'none';
+        }
+    }
+
+    // Update the count and total amount in HTML
+    document.getElementById('countDisplay').textContent = count;
+    document.getElementById('amountDisplay').textContent = totalAmount.toFixed(2);
+}
+
+
+
+    
+
+
+       
+
+
+
+
+
+            $(document).ready(function ($) {
             
 
             $(document).on('click', '.btn_pdf', function (event) {
@@ -149,7 +203,7 @@
                 var opt =
                 {
                     margin: 1,
-                    filename: 'gstr2' + '.pdf',
+                    filename: 'purchase_order_by_vendor' + '.pdf',
                     image: { type: 'png', quality: 1.0 },
                     html2canvas: { scale: 3, useCORS: true, backgroundColor: null },
                     jsPDF: { unit: 'in', format: 'a3', orientation: 'portrait' }
@@ -160,12 +214,13 @@
 
         });
 
+
         function shareViaWhatsApp() {
                     // Collect data from the table or any other relevant information
                     var tableData = getTableData(); // Implement the function to fetch table data
 
                     // Create a message to be shared on WhatsApp
-                    var message = "Check out the Purchase Order Details:\n" + tableData;
+                    var message = "Check out the Recurring Bill Details:\n" + tableData;
 
                     // Create a link with the WhatsApp API format
                     var whatsappLink = "https://wa.me/?text=" + encodeURIComponent(message);
@@ -189,29 +244,49 @@
                     return data;
                 }
 
+ 
+                function filterTable(filterValue) {
+                const table = document.getElementById('myTable');
+                const rows = table.getElementsByTagName('tr');
+                let count = 0;
 
-        function filterTable(filterValue) {
-            const table = document.getElementById('myTable');
-            const rows = table.getElementsByTagName('tr');
-            if (filterValue === 'All') {
-                for (let i = 2; i < rows.length; i++) {
-                const row = rows[i];
-                row.style.display = 'table-row';
-                }
-            }
-            else{
-            for (let i = 2; i < rows.length; i++) {
-                const row = rows[i];
-                const cells = row.getElementsByTagName('td');
-                const gstinCell = cells[0];
-                if ((filterValue === 'With' && gstinCell.textContent !== '') || (filterValue === 'Without' && gstinCell.textContent === '')) {
-                    row.style.display = 'table-row';
+                const fromDate = new Date(document.getElementById('in1').value);
+                const toDate = new Date(document.getElementById('in2').value);
+
+                if (filterValue === 'All') {
+                    for (let i = 2; i < rows.length; i++) {
+                        const row = rows[i];
+                        const dateCell = new Date(row.cells[0].textContent); // Assuming date is in the first column
+                        if (dateCell >= fromDate && dateCell <= toDate) {
+                            count = count + 1;
+                            row.style.display = 'table-row';
+                        } else {
+                            row.style.display = 'none';
+                        }
+                    }
                 } else {
-                    row.style.display = 'none';
+                    for (let i = 2; i < rows.length; i++) {
+                        const row = rows[i];
+                        const cells = row.getElementsByTagName('td');
+                        const profileNameCell = cells[2]; // Assuming the profile name is in the third column
+                        const dateCell = new Date(row.cells[0].textContent); // Assuming date is in the first column
+
+                        if (profileNameCell.textContent === filterValue && dateCell >= fromDate && dateCell <= toDate) {
+                            row.style.display = 'table-row';
+                            count = count + 1;
+                        } else {
+                            row.style.display = 'none';
+                        }
+                    }
                 }
+
+                // Update the count in HTML
+                document.getElementById('countDisplay').textContent = count;
             }
-        }
-        }
+
+
+
+
     </script>
 
     <script type="text/javascript">
@@ -262,6 +337,7 @@
 
         });
     </script>
+
     <script type="text/javascript">
         function exportAsExcel() {
             const table = document.getElementById('myTable'); // Replace 'myTable' with your table's ID
@@ -296,18 +372,21 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% for i in details %}
+                        {% for v in vendordetails %}
                         <tr class="text-center">
-                            <td>{{i.date}}</td>
-                            <td>{{i.account_number}}</td>
-                            <td>{{i.due_date}}</td>
-                            <td>{{i.vendor_name}}</td>
-                            
+                            <td>{{v.vendor_name}}</td>
+                            <td>{{v.vendor_mail}}</td>
+                            <td>{{v.number_of_orders}}</td>
+                            <td>{{v.total_amount}}</td>                            
                         </tr>
                         {% endfor %}
-                        Purchse Order Count : 
+                        
                     </tbody>
                 </table>
+                <div>
+                    <span style="font-weight: 600;">Total Count :</span> <label id="countDisplay"></label> <br>
+                    <!-- <span style="font-weight: 600;">Total Amount:</span> <label id="amountDisplay">{{defaultAmount}}</label> -->
+                </div>
                 <br>
 
             </div>

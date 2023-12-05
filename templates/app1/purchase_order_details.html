@@ -106,14 +106,8 @@
             </div>
             <div class="bar pt-4 px-2">
                 <div class="left ">
-                    <a class="btn btn-outline-info" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
-                        role="button"><i class="fa fa-filter"></i> Filter By
-                    </a>
-                    <div class="dropdown-menu">
-                        <a class="dropdown-item" onclick="filterTable('All')">All</a>
-                        <a class="dropdown-item" onclick="filterTable('With')">with GSTIN</a>
-                        <a class="dropdown-item" onclick="filterTable('Without')">without GSTIN</a>
-                    </div>
+                    <a class="btn btn-outline-info" onclick="filterTable('All')" role="button"><i class="fa fa-filter"></i> Filter By Date </a>
+                    
                 </div>
                 <div class="right">
 
@@ -190,29 +184,40 @@
                     return data;
                 }
 
+                function filterTable() {
+                    const table = document.getElementById('myTable');
+                    const rows = table.getElementsByTagName('tr');
+                    let count = 0;
+                    let totalAmount = 0;
 
-        function filterTable(filterValue) {
-            const table = document.getElementById('myTable');
-            const rows = table.getElementsByTagName('tr');
-            if (filterValue === 'All') {
-                for (let i = 2; i < rows.length; i++) {
-                const row = rows[i];
-                row.style.display = 'table-row';
+                    const fromDate = new Date(document.getElementById('in1').value);
+                    const toDate = new Date(document.getElementById('in2').value);
+
+                    // Set the time component of toDate to the end of the day
+                    toDate.setHours(23, 59, 59, 999);
+
+                    for (let i = 2; i < rows.length; i++) {
+                        const row = rows[i];
+                        const dateCell = new Date(row.cells[0].textContent); // Assuming date is in the first column
+                        const amountCell = parseFloat(row.cells[5].textContent); // Assuming amount is in the sixth column
+
+                        // Set the time component of dateCell to the end of the day
+                        dateCell.setHours(23, 59, 59, 999);
+
+                        if (fromDate <= dateCell && dateCell <= toDate) {
+                            count = count + 1;
+                            totalAmount += amountCell;
+                            row.style.display = 'table-row';
+                        } else {
+                            row.style.display = 'none';
+                        }
+                    }
+
+                    // Update the count and total amount in HTML
+                    document.getElementById('countDisplay').textContent = count;
+                    document.getElementById('amountDisplay').textContent = totalAmount.toFixed(2);
                 }
-            }
-            else{
-            for (let i = 2; i < rows.length; i++) {
-                const row = rows[i];
-                const cells = row.getElementsByTagName('td');
-                const gstinCell = cells[0];
-                if ((filterValue === 'With' && gstinCell.textContent !== '') || (filterValue === 'Without' && gstinCell.textContent === '')) {
-                    row.style.display = 'table-row';
-                } else {
-                    row.style.display = 'none';
-                }
-            }
-        }
-        }
+
     </script>
 
     <script type="text/javascript">

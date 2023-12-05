@@ -1359,7 +1359,7 @@ urlpatterns = [
 
     path('purchase_order_details',views.purchase_order_details,name='purchase_order_details'),
     path('purchase_orderby_vendor',views.purchase_orderby_vendor,name='purchase_orderby_vendor'),
-    path('recurring_bill_details',views.recurring_bill_details,name='recurring_bill_details'),
+    path('recurring_bill_report',views.recurring_bill_report,name='recurring_bill_report'),
     
  
  
