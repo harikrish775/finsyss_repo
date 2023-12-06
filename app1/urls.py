@@ -1354,13 +1354,12 @@ urlpatterns = [
     path('check_user_loan',views.check_user_loan,name='check_user_loan'),
     
     path('payment_draf_to_save/<int:id>',views.paymentDraftToSave, name='paymentDraftToSave'), 
-
-    # Harikrishnan-------------------------------------
-
+    
+    # Harikrishnan-urls------------------------------------
+    
     path('purchase_order_details',views.purchase_order_details,name='purchase_order_details'),
     path('purchase_orderby_vendor',views.purchase_orderby_vendor,name='purchase_orderby_vendor'),
     path('recurring_bill_report',views.recurring_bill_report,name='recurring_bill_report'),
-    
- 
+    #End
  
 ]

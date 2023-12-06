@@ -210,11 +210,13 @@
                             <div class="col-md-3 mt-2">
                                <label for="">Payment Terms</label>
                                <div class="d-flex">
-                                <select class="form-control" name="paymentterms">
-                                    <option value="Due on Receipt">Due on Receipt</option>
-                                    <option value="Net 60">NET 60</option>
-                                    <option value="Net 45">NET 45</option>
-                                    <option value="Net 30">NET 30</option>
+                                <select class="custom-select" name="paymentterms" id="termadd" onclick="showinp('newtrm', this)" required>
+                                    <option selected id="trmopt" hidden></option>
+                                    <option value="0">Due on Receipt</option>
+                                    <option value="15">NET 15</option>
+                                    <option value="30">NET 30</option>
+                                    <option value="60">NET 60</option>
+                                    <option id="new_crprd"></option>
                                     {% for pd in cpd %}
                                         <option value="{{ pd.newperiod }}">NET {{ pd.newperiod }}</option>
                                     {% endfor %}
@@ -458,7 +460,7 @@
                             </div>
                             <div class="modal-body">
                                 <div class="card p-3 m-3">
-                                    <form action="{% url 'credit_period1' %}" method="post" autocomplete="off">
+                                    <form id="crdt_prd_form" action="{% url 'credit_period1' %}" method="post" autocomplete="off">
                                         {% csrf_token %}
                                         <div class="row">
                                             <div class="col-md-2 mt-2"></div>
@@ -466,7 +468,7 @@
                                                 <input type="number" name="newperiod" class="form-control">
                                             </div>
                                             <div class="col-md-2 mt-2">
-                                                <button class="btn btn-outline-info text-grey mb-3" type="submit">Save</button>
+                                                <button class="btn btn-outline-info text-grey mb-3" type="submit" id="crpsavetbtn">Save</button>
                                             </div>
                                         </div>
                                     </form>  
@@ -479,6 +481,39 @@
         </div>
     </div>
     
+    <script>
+        $(document).ready(function () {
+            $('#crdt_prd_form').submit(function (e) {
+                e.preventDefault();
+                $.ajax({
+                    type: 'POST',
+                    url: $(this).attr('action'),
+                    data: $(this).serialize(),
+                    headers: {'X-CSRFToken': $('input[name="csrfmiddlewaretoken"]').val()},
+                    success: function (data) {
+                        console.log(data);
+    
+                        // Assuming data.newperiod contains only the numeric part
+                        var newCrdtName = "NET " + data.newperiod;
+    
+                        $('#termadd').append('<option value="' + newCrdtName + '">' + newCrdtName + '</option>');
+    
+                        $("#new_crprd").val(newCrdtName);
+    
+                        $("#crperiod").modal("hide");
+    
+                        $('#crdt_prd_form')[0].reset();
+                    },
+                    error: function (data) {
+                        console.log(data);
+                    }
+                });
+            });
+        });
+    </script>
+    
+    
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script>
         $('#date').val(new Date().toJSON().slice(0,10));

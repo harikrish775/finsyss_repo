@@ -50,7 +50,6 @@ from collections import defaultdict
 import re
 from django.db import connection
 from django.views.decorators.csrf import csrf_exempt
-from .models import purchaseorder,vendor,recurring_bill
 
 
 def index(request):
@@ -51403,19 +51402,22 @@ def paymentDraftToSave(request, id):
         pay.save()
         return redirect(payment_view, id)
 
-
-# Harikrishnan --------------------------------------------------
+# Harikrishnan_views --------------------------------------------------
 
 def purchase_order_details(request):
     cmp1 = company.objects.get(id=request.user)
     details = purchaseorder.objects.all()
-    return render(request,'app1/purchase_order_details.html',{'details':details,'cmp1':cmp1})
+    defaultCount = purchaseorder.objects.all().count()
+    defaultAmount=0
+    for i in details:
+        defaultAmount += int(i.grand_total)
+    return render(request,'app1/purchase_order_details.html',{'details':details,'cmp1':cmp1,'defaultCount':defaultCount,'defaultAmount':defaultAmount})
 
 def purchase_orderby_vendor(request):
     cmp1 = company.objects.get(id=request.user)
     vendr = vendor.objects.all()
     # vendordetails = purchaseorder.objects.values('vendor_name').distinct()
-    vendordetails = purchaseorder.objects.values('vendor_name').annotate(number_of_orders=Count('vendor_balance'),total_amount=Sum('grand_total'))
+    vendordetails = purchaseorder.objects.values('vendor_name','vendor_mail').annotate(number_of_orders=Count('vendor_balance'),total_amount=Sum('grand_total'))
     return render(request, 'app1/purchase_orderby_vendor.html', {'vendordetails': vendordetails,'vendor':vendr,'cmp1':cmp1})
 
 def recurring_bill_report(request):
@@ -51426,4 +51428,6 @@ def recurring_bill_report(request):
     for i in recur:
         defaultAmount += i.paid_amount
     return render(request,'app1/recurring_bill_report.html',{'cmp1':cmp1,'recur':recur,'defaultCount':defaultCount,'defaultAmount':defaultAmount})
-
+    
+    
+#--------End-----------------------
