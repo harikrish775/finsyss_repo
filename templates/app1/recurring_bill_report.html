@@ -131,7 +131,7 @@
                 </div> -->
                 <div class="right ml-auto" >
 
-                    <button class="btn btn_pdf btn-outline-info" onclick="exportToPDF()" >pdf</button>
+                    <button class="btn btn_pdf btn-outline-info" onclick="exportAsPDF()" >pdf</button>
                     <button class="btn btn_print btn-outline-info">Print</button>
                     <button class=" btn btn-outline-info" id="export-button" onclick="exportAsExcel()">Excel</button>
                     <button class="btn btn-outline-info dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -156,8 +156,8 @@
                                 <form action="{% url 'recurringBillDetailsToEmail' %}" method="post" class="needs-validation"
                                   id="share_to_email_form" autocomplete="off">
                                   {% csrf_token %}
-                                  <input name="FromD" class="inputdate form-control"  id="date1"  type="date" >
-                                  <input name="ToD" class="inputdate form-control"  id="date2" type="date" >
+                                  <input name="FromD" class="inputdate form-control"  id="date1"  type="date" hidden >
+                                  <input name="ToD" class="inputdate form-control"  id="date2" type="date" hidden>
                                   <div class="form-group">
                                     
                                     <label for="emailIds">Email IDs</label>
@@ -273,34 +273,91 @@ function shareViaWhatsApp() {
 
 
              
-
-
-
-
-
-$(document).ready(function ($) {
-    $(document).on('click', '.btn_pdf', function (event) {
-        console.log('print1');
-        event.preventDefault();
-
-        var element = document.getElementById('myTable');
-        element.style.backgroundColor = '#00000000'; // Set background color to transparent
-        element.style.color = 'black'; // Set text color to black
-        var elc = document.getElementById('rooww')
-        elc.style.color = 'black';
+                function exportAsPDF() {
+            const container = document.getElementById('pdf-card');
         
-
-        var opt = {
-            margin: 1,
-            filename: 'Recurring_bill_report' + '.pdf',
-            image: { type: 'png', quality: 1.0 },
-            html2canvas: { scale: 3, useCORS: true, backgroundColor: null , color: 'black' },
-            jsPDF: { unit: 'in', format: 'a3', orientation: 'portrait' }
+            // Save the original background color
+            const originalBackgroundColor = container.style.backgroundColor;
+        
+            // Set the container's background color to white
+            container.style.backgroundColor = 'white';
+        
+            // Apply styling changes to the container's content
+            const textWhiteElements = container.querySelectorAll('.text');
+            textWhiteElements.forEach(element => {
+            element.style.color = 'black'; // Set text color to black
+            });
+        
+            const tableElements = container.querySelectorAll('table');
+            const tableCells = container.querySelectorAll('td, th');
+            const tableRows = container.querySelectorAll('tr');
+        
+            tableElements.forEach(table => {
+            table.style.backgroundColor = '#ffffff'; // Set background color to white
+            table.style.color = '#000000'; // Set text color to black
+            });
+        
+            tableCells.forEach(cell => {
+            cell.style.backgroundColor = '#ffffff'; // Set background color to white
+            cell.style.color = '#000000'; // Set text color to black
+            cell.style.border = '1px solid black'; // Add a black border
+            });
+        
+            tableRows.forEach(row => {
+            row.style.backgroundColor = '#000000'; // Set background color to black
+            });
+        
+            const pdfOptions = {
+        margin: 0,
+        filename: '{{cmp1.cname}}_Recurring_Bill_Details.pdf',
+        image: { type: 'jpeg', quality: 1 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: 'mm', format: 'a3', orientation: 'portrait' }, // Adjust format and orientation
         };
 
-        html2pdf().set(opt).from(element).save();
-    });
-});
+        
+            // Generate PDF from the container
+            html2pdf().from(container).set(pdfOptions).save().then(() => {
+
+            // Restore the original background color
+            container.style.backgroundColor = originalBackgroundColor;
+
+            textWhiteElements.forEach(element => {
+                element.style.color = 'white'; // Restore original text color
+
+            // Remove the pdf-background class after generating the PDF
+            container.classList.remove('pdf-background');
+            });
+            window.location.reload();
+            });
+        }
+
+
+
+
+// $(document).ready(function ($) {
+//     $(document).on('click', '.btn_pdf', function (event) {
+//         console.log('print1');
+//         event.preventDefault();
+
+//         var element = document.getElementById('myTable');
+//         element.style.backgroundColor = '#00000000'; // Set background color to transparent
+//         element.style.color = 'black'; // Set text color to black
+//         var columnelement = document.getElementById('rooww')
+//         columnelement.style.color = 'black';
+        
+
+//         var opt = {
+//             margin: 1,
+//             filename: 'Recurring_bill_report' + '.pdf',
+//             image: { type: 'png', quality: 1.0 },
+//             html2canvas: { scale: 3, useCORS: true, backgroundColor: null , color: 'black' },
+//             jsPDF: { unit: 'in', format: 'a3', orientation: 'portrait' }
+//         };
+
+//         html2pdf().set(opt).from(element).save();
+//     });
+// });
 
          
 
@@ -383,30 +440,30 @@ $(document).ready(function ($) {
                     style="background-color: rgba(0, 0, 0, 0.2);" id="myTable">
                     <thead>
                         <tr>
-                            <th colspan="7" style="text-align: center;">Recurring Bill Details</th>
+                            <th colspan="7" style="text-align: center;" id="rooww">Recurring Bill Details</th>
                             </th>
                         </tr>
                         <tr>
-                            <th style="text-align: center;">Date</th>
-                            <th style="text-align: center;">Due Date</th>
-                            <th style="text-align: center;">Profile Name</th>
-                            <th style="text-align: center;">RB number</th>
-                            <th style="text-align: center;">Vendor Name</th>
-                            <th style="text-align: center;">Amount</th>
-                            <th style="text-align: center;">Balance</th>
+                            <th style="text-align: center;" id="rooww">Date</th>
+                            <th style="text-align: center;" id="rooww">Due Date</th>
+                            <th style="text-align: center;" id="rooww">Profile Name</th>
+                            <th style="text-align: center;" id="rooww">RB number</th>
+                            <th style="text-align: center;" id="rooww">Vendor Name</th>
+                            <th style="text-align: center;" id="rooww">Amount</th>
+                            <th style="text-align: center;" id="rooww">Balance</th>
 
                         </tr>
                     </thead>
                     <tbody>
                         {% for i in recur %}
-                        <tr class="text-center" id="rooww">
-                            <td>{{i.start_date}}</td>
-                            <td>{{i.end_date}}</td>
-                            <td>{{i.profile_name}}</td>
-                            <td>{{i.billno}}</td>
-                            <td>{{i.vendor_name}}</td>
-                            <td>{{i.paid_amount}}</td>
-                            <td>{{i.balance}}</td>
+                        <tr class="text-center" >
+                            <td id="rooww">{{i.start_date}}</td>
+                            <td id="rooww">{{i.end_date}}</td>
+                            <td id="rooww">{{i.profile_name}}</td>
+                            <td id="rooww">{{i.billno}}</td>
+                            <td id="rooww">{{i.vendor_name}}</td>
+                            <td id="rooww">{{i.paid_amount}}</td>
+                            <td id="rooww">{{i.balance}}</td>
                         </tr>
                         {% endfor %}
                         
@@ -424,100 +481,7 @@ $(document).ready(function ($) {
         </div>
     </div>
 <script>
-    // document.getElementById("FromDate").addEventListener("change", function () {
-    //     const selectedValue = this.value;
-    //     const dynamicCell = document.getElementById("year");
-
-
-    //     dynamicCell.innerHTML = selectedValue;
-    //     document.getElementById("id1").innerHTML = selectedValue;
-    //     document.getElementById("externalDataInput").value = selectedValue;
-    // });
-
-// function shareViaGmail() {
-//                     var FromDate = document.getElementById('in1').value;
-//                     var ToDate = document.getElementById('in2').value;
-//                     // Collect data from the table or any other relevant information
-//                     if (FromDate == '' && ToDate == ''){
-//                        // Collect data from the table or any other relevant information
-//                         var tableData = getTableData(); // Implement the function to fetch table data
-
-//                     // Create email subject and body
-//                     var emailSubject = "Recurring Bill Details";
-//                     var emailBody = "Check out the Recurring Bill Details:\n" + tableData;
-
-//                     // Create a mailto link with subject and body for Gmail
-//                     var gmailLink = "https://mail.google.com/mail/?view=cm&fs=1&to=&su=" + encodeURIComponent(emailSubject) + "&body=" + encodeURIComponent(emailBody);
-
-//                     // Open the link in a new tab or window
-//                     window.open(gmailLink, "_blank");
-//                     }
-//                     else{
-//                         // Collect data from the table or any other relevant information
-//                         var tableData = getFilteredTableData(); // Implement the function to fetch table data
-
-//                     // Create email subject and body
-//                     var emailSubject = "Recurring Bill Details";
-//                     var emailBody = "Check out the Recurring Bill Details:\n" + tableData;
-
-//                     // Create a mailto link with subject and body for Gmail
-//                     var gmailLink = "https://mail.google.com/mail/?view=cm&fs=1&to=&su=" + encodeURIComponent(emailSubject) + "&body=" + encodeURIComponent(emailBody);
-
-//                     // Open the link in a new tab or window
-//                     window.open(gmailLink, "_blank");
-//                 }
-//                 }
-
-
-// document.getElementById('generateAndSendPdf').addEventListener('click', function () {
-//     // Get the HTML content of the table
-//     const tableContent = document.getElementById('pdf-card').outerHTML;
-
-//     // Convert the HTML to PDF
-//     html2pdf().from(tableContent).outputPdf().then(function (pdf) {
-//       // Convert the PDF to a data URL
-//       const pdfDataUrl = URL.createObjectURL(new Blob([pdf], { type: 'application/pdf' }));
-
-//       // Send the PDF via email using a server-side endpoint
-//       sendEmailWithAttachment(pdfDataUrl);
-//     });
-//   });
-
-//   function sendEmailWithAttachment(pdfDataUrl) {
-//     var email_id = document.getElementById('email_ids').value
-//     // Perform a fetch request to your server endpoint
-//     // Include necessary data in the request (pdfDataUrl, recipient email, etc.)
-//     // Example using Fetch API:
-//     console.log('fetch');
-//     fetch('send_pdf_email', {
-//       method: 'POST',
-//       headers: {
-//         'Content-Type': 'application/json',
-//       },
-//       body: JSON.stringify({
-//         pdfDataUrl: pdfDataUrl,
-//         recipientEmail: email_id, // Replace with the actual recipient email
-//         emailMessage: 'Recurring bill reports.',
-//       }),
-//     })
-//       .then(response => {
-//         if (response.ok) {
-//           Swal.fire('Email Sent', 'Your email has been sent successfully!', 'success');
-//         } else {
-//           Swal.fire('Error', 'Failed to send email.', 'error');
-//         }
-//       })
-//       .catch(error => {
-//         console.error('Error:', error);
-//         Swal.fire('Error', 'An error occurred while sending the email.', 'error');
-//       });
-//   }
-
-
-
-
-
-
+    
 
 
 
@@ -529,11 +493,19 @@ function filterTable() {
     let count = 0;
     let totalAmount = 0;
 
+    
     const fromDate = new Date(document.getElementById('in1').value);
     const toDate = new Date(document.getElementById('in2').value);
+    if(fromDate === '' || toDate === ''){
+        
+    }else{
+        var formattedDate1 = toDate.toISOString().split('T')[0];
+        var formattedDate2 = fromDate.toISOString().split('T')[0];
+    }
+    
 
-    document.getElementById("date1").value = fromDate.getFullYear() + '-' + padZero(fromDate.getMonth() + 1) + '-' + padZero(fromDate.getDate());
-    document.getElementById("date2").value = toDate.getFullYear() + '-' + padZero(fromDate.getMonth() + 1) + '-' + padZero(fromDate.getDate());
+    document.getElementById("date1").value = formattedDate2;
+    document.getElementById("date2").value = formattedDate1;
 
     // Set the time component of toDate to the end of the day
     toDate.setHours(23, 59, 59, 999);

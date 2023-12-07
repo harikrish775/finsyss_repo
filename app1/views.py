@@ -51435,73 +51435,153 @@ def recurring_bill_report(request):
         defaultAmount += i.paid_amount
     return render(request,'app1/recurring_bill_report.html',{'cmp1':cmp1,'recur':recur,'defaultCount':defaultCount,'defaultAmount':defaultAmount})
     
-def recurring_bill_report_pdf(request):
-    return render(request,'app1/recurring_bill_report_pdf.html')
 
 def recurringBillDetailsToEmail(request):
+        if request.user:
+            try:
+                if request.method == 'POST':
+                    fromdate = request.POST['FromD']
+                    todate = request.POST['ToD']
+                    emails_string = request.POST['email_ids']
+                    if fromdate == '' and todate == '' :
+                        data = recurring_bill.objects.filter(start_date__gte=fromdate, start_date__lte=todate)
+                    else:
+                        data = recurring_bill.objects.all()
+
+                    # Split the string by commas and remove any leading or trailing whitespace
+                    emails_list = [email.strip() for email in emails_string.split(',')]
+                    email_message = request.POST['email_message']
+                    
+                    cmp = company.objects.get(id_id=request.user.id)
+                    
+
+                    context = {'cmp': cmp, 'data': data, 'email_message': email_message}
+                    print('context working')
+                    template_path = 'app1/recurring_bill_report_pdf.html'
+                    print('tpath working')
+                    template = get_template(template_path)
+                    print('template working')
+                    html = template.render(context)
+                    print('html working')
+                    result = BytesIO()
+                    print('bytes working')
+                    pdf = pisa.pisaDocument(BytesIO(html.encode("ISO-8859-1")), result)
+                    print('pisa working')
+
+                    if pdf.err:
+                        raise Exception(f"PDF generation error: {pdf.err}")
+
+                    pdf = result.getvalue()
+                    print('')
+                    filename = f'recurring_bill_report-{cmp.cname}.pdf'
+                    subject = f"recurring_bill_report - {cmp.cname}"
+                    email = EmailMessage(subject, f"Hi, \n{email_message} -of -{cmp.cname}-{cmp.cname}. ", from_email=settings.EMAIL_HOST_USER, to=emails_list)
+                    email.attach(filename, pdf, "application/pdf")
+                    email.send(fail_silently=False)
+
+                    messages.success(request, 'Report has been shared via email successfully..!')
+                    return redirect('recurring_bill_report')
+            except Exception as e:
+                messages.error(request, f'Error while sending report: {e}')
+                return redirect('recurring_bill_report')
+
+
+def purchaseOrderByVendorToEmail(request):
     if request.user:
-        try:
-            if request.method == 'POST':
-                emails_string = request.POST['email_ids']
-                fromdate =  request.POST['FromD']
-                todate = request.POST['ToD']
+            try:
+                if request.method == 'POST':
+                    # fromdate = request.POST['FromD']
+                    # todate = request.POST['ToD']
+                    emails_string = request.POST['email_ids']
+                    # if fromdate == '' and todate == '' :
+                    #     data = purchaseorder.objects.filter(start_date__gte=fromdate, start_date__lte=todate)
+                    # else:
+                    data = purchaseorder.objects.values('vendor_name','vendor_mail').annotate(number_of_orders=Count('vendor_balance'),total_amount=Sum('grand_total'))
 
-                # Split the string by commas and remove any leading or trailing whitespace
-                emails_list = [email.strip() for email in emails_string.split(',')]
-                email_message = request.POST['email_message']
-                
+                    # Split the string by commas and remove any leading or trailing whitespace
+                    emails_list = [email.strip() for email in emails_string.split(',')]
+                    email_message = request.POST['email_message']
+                    
+                    cmp = company.objects.get(id_id=request.user.id)
+                    
 
-                cmp = company.objects.get( id_id = request.user.id)
-                print(cmp)
-                data = recurring_bill.objects.filter(start_date__gt = fromdate,start_date__lt = todate)
-                # data = recurring_bill.objects.all()
-                        
-                context = {'cmp': cmp,'data': data,'email_message':email_message}
-                template_path = 'recurring_bill_report_pdf.html'
-                template = get_template(template_path)
+                    context = {'cmp': cmp, 'data': data, 'email_message': email_message}
+                    print('context working')
+                    template_path = 'app1/purchase_orderby_vendor_pdf.html'
+                    print('tpath working')
+                    template = get_template(template_path)
+                    print('template working')
+                    html = template.render(context)
+                    print('html working')
+                    result = BytesIO()
+                    print('bytes working')
+                    pdf = pisa.pisaDocument(BytesIO(html.encode("ISO-8859-1")), result)
+                    print('pisa working')
 
-                html  = template.render(context)
-                result = BytesIO()
-                pdf = pisa.pisaDocument(BytesIO(html.encode("ISO-8859-1")), result)#, link_callback=fetch_resources)
-                pdf = result.getvalue()
-                filename = f'Godown Report - {cmp.cname}.pdf'
-                subject = f"Godown Report - {cmp.cname}"
-                email = EmailMessage(subject, f"Hi,\nPlease find the attached Recurring Bill Report -of -{cmp.cname}. \n{email_message}\n\n--\nRegards,\n{cmp.cname}\n{cmp.address}\n{cmp.state} - {cmp.country}\n{cmp.contact_number}", from_email=settings.EMAIL_HOST_USER,to=emails_list)
-                email.attach(filename, pdf, "application/pdf")
-                email.send(fail_silently=False)
+                    if pdf.err:
+                        raise Exception(f"PDF generation error: {pdf.err}")
 
-                msg = messages.success(request, 'Report has been shared via email successfully..!')
-                return redirect('recurring_bill_report_pdf')
-        except Exception as e:
-            print(e)
-            messages.error(request, f'{e}')
-            return redirect('recurring_bill_report_pdf')  
+                    pdf = result.getvalue()
+                    print('')
+                    filename = f'purchase-orderby-vendor-{cmp.cname}.pdf'
+                    subject = f"purchase-orderby-vendor - {cmp.cname}"
+                    email = EmailMessage(subject, f"Hi, \n{email_message} -of -{cmp.cname}. ", from_email=settings.EMAIL_HOST_USER, to=emails_list)
+                    email.attach(filename, pdf, "application/pdf")
+                    email.send(fail_silently=False)
 
-# def send_pdf_email(request):
-#     if request.method == 'POST':
-#         data = request.POST
-#         pdf_data_url = data.get('pdfDataUrl', '')
-#         recipient_email = data.get('recipientEmail', '')
-#         email_message = data.get('emailMessage', '')
+                    messages.success(request, 'Report has been shared via email successfully..!')
+                    return redirect('purchase_orderby_vendor')
+            except Exception as e:
+                messages.error(request, f'Error while sending report: {e}')
+                return redirect('purchase_orderby_vendor')
 
-#         # Convert data URL to bytes
-#         pdf_data = pdf_data_url.split(',')[1]
-#         pdf_bytes = bytes(pdf_data, 'utf-8')
+def purchaseOrderDetailsToEmail(request):
+    if request.user:
+            try:
+                if request.method == 'POST':
+                    # fromdate = request.POST['FromD']
+                    # todate = request.POST['ToD']
+                    emails_string = request.POST['email_ids']
+                    # if fromdate == '' and todate == '' :
+                    #     data = purchaseorder.objects.filter(start_date__gte=fromdate, start_date__lte=todate)
+                    # else:
+                    data = purchaseorder.objects.all()
 
-#         # Attach PDF to email
-#         email = EmailMessage(
-#             'Recurring bill reports.',
-#             'Body of the Email',
-#             'your.email@gmail.com',
-#             [recipient_email],
-#         )
-#         email.attach('example.pdf', pdf_bytes, 'application/pdf')
+                    # Split the string by commas and remove any leading or trailing whitespace
+                    emails_list = [email.strip() for email in emails_string.split(',')]
+                    email_message = request.POST['email_message']
+                    
+                    cmp = company.objects.get(id_id=request.user.id)
+                    
 
-#         # Send email
-#         try:
-#             email.send()
-#             return JsonResponse({'success': True})
-#         except Exception as e:
-#             return JsonResponse({'success': False, 'error_message': str(e)})
+                    context = {'cmp': cmp, 'data': data, 'email_message': email_message}
+                    print('context working')
+                    template_path = 'app1/purchase_order_details_pdf.html'
+                    print('tpath working')
+                    template = get_template(template_path)
+                    print('template working')
+                    html = template.render(context)
+                    print('html working')
+                    result = BytesIO()
+                    print('bytes working')
+                    pdf = pisa.pisaDocument(BytesIO(html.encode("ISO-8859-1")), result)
+                    print('pisa working')
+
+                    if pdf.err:
+                        raise Exception(f"PDF generation error: {pdf.err}")
+
+                    pdf = result.getvalue()
+                    print('')
+                    filename = f'purchase_order_details-{cmp.cname}.pdf'
+                    subject = f"purchase_order_details - {cmp.cname}"
+                    email = EmailMessage(subject, f"Hi, \n{email_message} -of -{cmp.cname}. ", from_email=settings.EMAIL_HOST_USER, to=emails_list)
+                    email.attach(filename, pdf, "application/pdf")
+                    email.send(fail_silently=False)
+
+                    messages.success(request, 'Report has been shared via email successfully..!')
+                    return redirect('purchase_order_details')
+            except Exception as e:
+                messages.error(request, f'Error while sending report: {e}')
+                return redirect('purchase_order_details')
 
 #--------End-----------------------

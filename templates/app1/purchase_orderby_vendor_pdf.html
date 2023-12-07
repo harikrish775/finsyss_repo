@@ -13,7 +13,7 @@
 
   <style>
     #tab td{
-        margin-left: 20px;
+        margin-left: 35px;
     }
   </style>
 </head>
@@ -47,48 +47,39 @@
             </div>
             <div ><center>
                 <h3 style="color: rgb(0, 0, 0);">
-                    <center class="text-black"><b>RECURRING BILL REPORT</b></center>
+                    <center class="text-black"><b>PURCHASE ORDER BY <span id="vendorName">VENDORS</span></b></center>
                      <center class="text-black"><b>{{ cmp.cname }}</b></center>
                  </h3>
             </center></div>
             <hr />
             <section class="product-area mt-4">
                 <table class="table table-bordered table-striped mt-4" id="data-table">
-                    <thead class="text-white">
-                      
+                    <thead>
                         <tr>
-                            <th style="color: rgb(0,0,0);">Date</th>
-                            <th style="color: rgb(0, 0, 0);">Due Date</th>
-                            <th style="color: rgb(0, 0, 0);">Profile Name</th>
-                            <th style="color: rgb(0, 0, 0);">RB number</th>
-                            <th style="color: rgb(0, 0, 0);">Vendor Name</th>
-                            <th style="color: rgb(0, 0, 0);">Amount</th>
-                            <th style="color: rgb(0, 0, 0);">Balance</th>
-                            
+                            <th colspan="6" style="text-align: center;color: rgb(0, 0, 0);">Purchase Order By <span id="vendorName">Vendors</span></th>
+                            </th>
                         </tr>
-                        <!-- <tr class="text-center" id="tab" >
-                            <td style="color: rgb(0, 0, 0);" >aasdadad</td>
-                            <td style="color: rgb(0, 0, 0);">sfafafa</td>
-                            <td style="color: rgb(0, 0, 0);">gsssdddddd</td>
-                            <td style="color: rgb(0, 0, 0);">gggggggggggv</td>
-                            <td style="color: rgb(0, 0, 0);">vvvvvvvvvvv</td>
-                            <td style="color: rgb(0, 0, 0);">bbbbbbbbb</td>
-                            <td style="color: rgb(0, 0, 0);">bbbbbbbbbb</td>
-                        </tr> -->
+                        <tr>
+                            <th style="text-align: center; color: rgb(0, 0, 0);">Vendor Name</th>
+                            <th style="text-align: center; color: rgb(0, 0, 0);">Mail ID </th>
+                            <th style="text-align: center; color: rgb(0, 0, 0);">Purchase Order Count(Total Count)</th>
+                            <th style="text-align: center; color: rgb(0, 0, 0);">Amount( Total Amount)</th>
+                            
+
+                        </tr>
                     </thead>
-                  <tbody>
-                     {% for i in data %}
-                     <tr class="text-center" id="tab" >
-                        <td style="color: rgb(0, 0, 0);">{{i.start_date}}</td>
-                        <td style="color: rgb(0, 0, 0);">{{i.end_date}}</td>
-                        <td style="color: rgb(0, 0, 0);">{{i.profile_name}}</td>
-                        <td style="color: rgb(0, 0, 0);">{{i.billno}}</td>
-                        <td style="color: rgb(0, 0, 0);">{{i.vendor_name}}</td>
-                        <td style="color: rgb(0, 0, 0);">{{i.paid_amount}}</td>
-                        <td style="color: rgb(0, 0, 0);">{{i.balance}}</td>
-                    </tr>
-                    {% endfor %} 
-                  </tbody>
+                    <tbody>
+                        {% for v in data %}
+                        <tr class="text-center" id="tab">
+                            
+                            <td style="color: rgb(0, 0, 0);">{{v.vendor_name}}</td>
+                            <td style="color: rgb(0, 0, 0);">{{v.vendor_mail}}</td>
+                            <td style="color: rgb(0, 0, 0);">{{v.number_of_orders}}</td>
+                            <td style="color: rgb(0, 0, 0);">{{v.total_amount}}</td>                            
+                        </tr>
+                        {% endfor %}
+                        
+                    </tbody>
                                             
                   </table> 
             </section>

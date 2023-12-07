@@ -13,7 +13,7 @@
 
   <style>
     #tab td{
-        margin-left: 20px;
+        margin-left: 40px;
     }
   </style>
 </head>
@@ -56,38 +56,28 @@
                 <table class="table table-bordered table-striped mt-4" id="data-table">
                     <thead class="text-white">
                       
-                        <tr>
-                            <th style="color: rgb(0,0,0);">Date</th>
-                            <th style="color: rgb(0, 0, 0);">Due Date</th>
-                            <th style="color: rgb(0, 0, 0);">Profile Name</th>
-                            <th style="color: rgb(0, 0, 0);">RB number</th>
-                            <th style="color: rgb(0, 0, 0);">Vendor Name</th>
-                            <th style="color: rgb(0, 0, 0);">Amount</th>
-                            <th style="color: rgb(0, 0, 0);">Balance</th>
+                        <tr style="color: black;">
+                            <th style="text-align: center;">Date</th>
+                            <th style="text-align: center;">Number </th>
+                            <th style="text-align: center;">Due Date</th>
+                            <th style="text-align: center;">Vendor Name</th>
+                            <th style="text-align: center;">Status</th>
+                            <th style="text-align: center;">Amount</th>
                             
                         </tr>
-                        <!-- <tr class="text-center" id="tab" >
-                            <td style="color: rgb(0, 0, 0);" >aasdadad</td>
-                            <td style="color: rgb(0, 0, 0);">sfafafa</td>
-                            <td style="color: rgb(0, 0, 0);">gsssdddddd</td>
-                            <td style="color: rgb(0, 0, 0);">gggggggggggv</td>
-                            <td style="color: rgb(0, 0, 0);">vvvvvvvvvvv</td>
-                            <td style="color: rgb(0, 0, 0);">bbbbbbbbb</td>
-                            <td style="color: rgb(0, 0, 0);">bbbbbbbbbb</td>
-                        </tr> -->
+                       
                     </thead>
                   <tbody>
-                     {% for i in data %}
-                     <tr class="text-center" id="tab" >
-                        <td style="color: rgb(0, 0, 0);">{{i.start_date}}</td>
-                        <td style="color: rgb(0, 0, 0);">{{i.end_date}}</td>
-                        <td style="color: rgb(0, 0, 0);">{{i.profile_name}}</td>
-                        <td style="color: rgb(0, 0, 0);">{{i.billno}}</td>
-                        <td style="color: rgb(0, 0, 0);">{{i.vendor_name}}</td>
-                        <td style="color: rgb(0, 0, 0);">{{i.paid_amount}}</td>
-                        <td style="color: rgb(0, 0, 0);">{{i.balance}}</td>
+                    {% for i in data %}
+                    <tr class="text-center" id="tab">
+                        <td style="color: black;">{{i.date}}</td>
+                        <td style="color: black;">{{i.puchaseorder_no}}</td>
+                        <td style="color: black;">{{i.due_date}}</td>
+                        <td style="color: black;">{{i.vendor_name}}</td>
+                        <td style="color: black;">{% if i.status == 'Billed' %}Converted to Bill{% else %} Not converted to Bill {% endif %}</td>
+                        <td style="color: black;">{{i.grand_total}}</td>
                     </tr>
-                    {% endfor %} 
+                    {% endfor %}
                   </tbody>
                                             
                   </table> 
