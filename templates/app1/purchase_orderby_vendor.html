@@ -105,30 +105,20 @@
             <div class="bar pt-4 px-2">
                 <div class="left ">
                     <label for="">Filter By Vendor</label><br>
-                    <!-- <input type="search" class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                       
-                      </input>
-                    
-                      <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-                        <a class="dropdown-item" onclick="filterTable('All')">All</a>
-                        {% for i in vendor %}
-                        <a class="dropdown-item" onclick="filterTable('{{i.firstname}}')">{{i.firstname}} {{i.lastname}}</a>
-                        {% endfor %}
-                      </div> -->
-                      <div class="flex-grow-1 search-bar">
-                        <div class="input-group">
+                    <div class="flex-grow-1 search-bar" >
+                        <div class="input-group" style="left: -40px;">
                           <div class="input-group-prepend search-arrow-back">
                             <button class="btn btn-search-back" type="button"><i class="bx bx-arrow-back"></i>
                             </button>
                           </div>
                           <input type="text" autocomplete="off" id="myInput1" onkeyup="filter(this);" onclick="myFunction1()"
-                            class="form-control" placeholder="search" />
-                          <div class="input-group-append">
+                            class="form-control" placeholder="search"  />
+                          <!-- <div class="input-group-append">
                             <button class="btn btn-search" type="button"><i class="lni lni-search-alt"></i>
                             </button>
-                          </div>
-                          <div class=" mt-5" id="myDIV" style="z-index:1;position:absolute; 
-                          background-color: #213b52;width:550px;height:1px;">
+                          </div> -->
+                          <div class=" mt-5 " id="myDIV" style="z-index:1;position:absolute; 
+                          background-color: #213b52;width:220px;height:1px;">
             
                             <ul id="myList1" class="one" style="background-color: #213b52;">
                                 {% for v in vendor %}
@@ -374,52 +364,56 @@ function getTableData() {
     </script>
 
     <script type="text/javascript">
-        $(document).ready(function ($) {
+       $(document).ready(function ($) {
 
-            $(document).on('click', '.btn_print', function (event) {
-                console.log('print1');
-                event.preventDefault();
-
-
-                const pdfCard = document.getElementById('pdf-card').cloneNode(true);
-
-                // Create a new window for printing
-                const printWindow = window.open('', '');
-                pdfCard.style.color = 'black';
-                pdfCard.style.backgroundColor = '#243e54';
-                const pageTitle = printWindow.document.createElement('h1');
-                pageTitle.textContent = 'PURCHASE ORDER DETAILS'; // Replace 'Page Title' with your desired title text
-                pageTitle.style.textAlign = 'center';
-                pageTitle.style.color = 'black';
-
-                // Append the <h1> element to the new window's body
-                printWindow.document.body.appendChild(pageTitle);
-
-                // Append the cloned 'pdf-card' div to the new window
-                printWindow.document.body.appendChild(pdfCard);
-
-                // Ensure the styles are preserved by copying CSS from the original document
-                const stylesheets = document.styleSheets;
-                for (let i = 0; i < stylesheets.length; i++) {
-                    const stylesheet = stylesheets[i];
-                    if (stylesheet.href) {
-                        const link = printWindow.document.createElement('link');
-                        link.rel = 'stylesheet';
-                        link.href = stylesheet.href;
-                        printWindow.document.head.appendChild(link);
-                    }
-                }
-
-                // Trigger the print dialog for the new window
-                printWindow.print();
-
-                // Close the new window after printing
-                printWindow.close();
+$(document).on('click', '.btn_print', function (event) {
+    console.log('print1');
+    event.preventDefault();
 
 
-            });
+    const pdfCard = document.getElementById('pdf-card').cloneNode(true);
 
-        });
+    // Create a new window for printing
+    const printWindow = window.open('', '');
+    pdfCard.style.color = 'black';
+    pdfCard.style.backgroundColor = '#243e54';
+    const pageTitle = printWindow.document.createElement('h1');
+    pageTitle.textContent = 'RECURRING BILL REPORTS'; // Replace 'Page Title' with your desired title text
+    pageTitle.style.textAlign = 'center';
+    pageTitle.style.color = 'black';
+
+    // Append the <h1> element to the new window's body
+    printWindow.document.body.appendChild(pageTitle);
+
+    // Append the cloned 'pdf-card' div to the new window
+    printWindow.document.body.appendChild(pdfCard);
+
+    // Ensure the styles are preserved by copying CSS from the original document
+    const stylesheets = document.styleSheets;
+    for (let i = 0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        if (stylesheet.href) {
+            const link = printWindow.document.createElement('link');
+            link.rel = 'stylesheet';
+            link.href = stylesheet.href;
+            printWindow.document.head.appendChild(link);
+        }
+    }
+    const table = printWindow.document.querySelector('#pdf-card table'); // Adjust the selector based on your table structure
+    if (table) {
+        table.style.margin = 'auto';
+    }
+
+    // Trigger the print dialog for the new window
+    printWindow.print();
+
+    // Close the new window after printing
+    printWindow.close();
+
+
+});
+
+});
     </script>
 
     <script type="text/javascript">

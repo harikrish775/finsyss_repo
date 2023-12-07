@@ -12,6 +12,24 @@
 <!-- Include jQuery from a CDN -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
+<!-- Include jsPDF from CDN -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+
+<!-- Include jsPDF -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+
+<!-- Include jsPDF-AutoTable plugin -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.16/jspdf.plugin.autotable.min.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+<!-- Add these links to include the required libraries -->
+<script src="https://rawgit.com/eKoopmans/html2pdf/master/dist/html2pdf.bundle.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+
+
+
 
 <style>
     #ui-datepicker-div {
@@ -113,18 +131,57 @@
                 </div> -->
                 <div class="right ml-auto" >
 
-                    <button class="btn btn_pdf btn-outline-info">pdf</button>
+                    <button class="btn btn_pdf btn-outline-info" onclick="exportToPDF()" >pdf</button>
                     <button class="btn btn_print btn-outline-info">Print</button>
                     <button class=" btn btn-outline-info" id="export-button" onclick="exportAsExcel()">Excel</button>
                     <button class="btn btn-outline-info dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         Share
                     </button>
-                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                    <div class="dropdown-menu " style="background-color: #243e54 ;" aria-labelledby="dropdownMenuButton">
                         <a class="dropdown-item" style="cursor: pointer;" onclick="shareViaWhatsApp()">Whatsapp</a>
-                        <a class="dropdown-item" style="cursor: pointer;" onclick="shareViaGmail()">Email</a>
+                        <a class="dropdown-item" style="cursor: pointer;" data-target="#shareBillEmail" data-toggle="modal">Email</a>
                         
                     </div>
-                    
+                        <!--  -->
+                    <div class="modal fade" id="shareBillEmail">
+                        <div class="modal-dialog modal-xl">
+                          <div class="modal-content" style="background: #243e54;border-radius: 20px;">
+                            <div class="modal-header" style="background: #243e54;">
+                              <h5 class="m-3 text-uppercase" id="shareBillEmailLabel">Share Sales Order Via Email</h5>
+                              <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                  aria-hidden="true">&times;</span></button>
+                            </div>
+                            <div class="modal-body" style="background: #243e54;">
+                              <div class="card p-3 m-3">
+                                <form action="{% url 'recurringBillDetailsToEmail' %}" method="post" class="needs-validation"
+                                  id="share_to_email_form" autocomplete="off">
+                                  {% csrf_token %}
+                                  <input name="FromD" class="inputdate form-control"  id="date1"  type="date" >
+                                  <input name="ToD" class="inputdate form-control"  id="date2" type="date" >
+                                  <div class="form-group">
+                                    
+                                    <label for="emailIds">Email IDs</label>
+                                    <textarea class="form-control text-light" name="email_ids" id="emailIds" rows="5"
+                                      placeholder="Multiple emails can be added by separating with a comma(,)." required></textarea>
+                                  </div>
+                                  <div class="form-group mt-2">
+                                    <label for="item_unitname">Message(optional)</label>
+                                    <textarea name="email_message" id="email_message" class=" form-control text-light" cols=""
+                                      rows="4" placeholder="This message will be sent along with Bill details."></textarea>
+                                  </div>
+                                
+                              </div>
+                              <div class="modal-footer d-flex justify-content-center" style="border-top: 1px solid #ffff;">
+                                <input type="submit" id="generateAndSendPdf" class="submitShareEmailBtn rounded-pill text-grey w-50 my-4 mx-3" style="background-color: #0d2b46;padding: 7px 0;" value="SEND MAIL">
+                              </div>
+                            </div></form>
+            
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                    <!--  -->
 
                 </div>
             </div>
@@ -215,36 +272,37 @@ function shareViaWhatsApp() {
 
 
 
-            
-  
+             
 
 
 
 
 
+$(document).ready(function ($) {
+    $(document).on('click', '.btn_pdf', function (event) {
+        console.log('print1');
+        event.preventDefault();
 
-        $(document).ready(function ($) {
-            
+        var element = document.getElementById('myTable');
+        element.style.backgroundColor = '#00000000'; // Set background color to transparent
+        element.style.color = 'black'; // Set text color to black
+        var elc = document.getElementById('rooww')
+        elc.style.color = 'black';
+        
 
-            $(document).on('click', '.btn_pdf', function (event) {
-                console.log('print1');
-                event.preventDefault();
-                var element = document.getElementById('pdf-card');
-                element.style.color = 'black';
-                element.style.backgroundColor = '#243e54';
-                var opt =
-                {
-                    margin: 1,
-                    filename: 'Recurring_bill_report' + '.pdf',
-                    image: { type: 'png', quality: 1.0 },
-                    html2canvas: { scale: 3, useCORS: true, backgroundColor: null },
-                    jsPDF: { unit: 'in', format: 'a3', orientation: 'portrait' }
-                };
-                html2pdf().set(opt).from(element).save();
+        var opt = {
+            margin: 1,
+            filename: 'Recurring_bill_report' + '.pdf',
+            image: { type: 'png', quality: 1.0 },
+            html2canvas: { scale: 3, useCORS: true, backgroundColor: null , color: 'black' },
+            jsPDF: { unit: 'in', format: 'a3', orientation: 'portrait' }
+        };
 
-            });
+        html2pdf().set(opt).from(element).save();
+    });
+});
 
-        });
+         
 
 
         
@@ -252,6 +310,7 @@ function shareViaWhatsApp() {
     </script>
 
     <script type="text/javascript">
+
         $(document).ready(function ($) {
 
             $(document).on('click', '.btn_print', function (event) {
@@ -287,6 +346,10 @@ function shareViaWhatsApp() {
                         printWindow.document.head.appendChild(link);
                     }
                 }
+                const table = printWindow.document.querySelector('#pdf-card table'); // Adjust the selector based on your table structure
+                if (table) {
+                    table.style.margin = 'auto';
+                }
 
                 // Trigger the print dialog for the new window
                 printWindow.print();
@@ -314,7 +377,7 @@ function shareViaWhatsApp() {
 
     <div class="card radius-15 print-only" id="pdf-card">
         <div class="card-body">
-            <div class="container-fluid">
+            <div class="container-fluid" id="myTable1">
 
                 <table class="table table-responsive-md mt-4 table-hover table-bordered"
                     style="background-color: rgba(0, 0, 0, 0.2);" id="myTable">
@@ -336,7 +399,7 @@ function shareViaWhatsApp() {
                     </thead>
                     <tbody>
                         {% for i in recur %}
-                        <tr class="text-center">
+                        <tr class="text-center" id="rooww">
                             <td>{{i.start_date}}</td>
                             <td>{{i.end_date}}</td>
                             <td>{{i.profile_name}}</td>
@@ -352,8 +415,8 @@ function shareViaWhatsApp() {
                 </table>
 
                 <div>
-                    <span style="font-weight: 600;">Total Count :</span> <label id="countDisplay">{{defaultCount}}</label> <br>
-                    <span style="font-weight: 600;">Total Amount:</span> <label id="amountDisplay">{{defaultAmount}}</label>
+                    <span style="font-weight: 600; color: white;">Total Count :</span> <label id="countDisplay">{{defaultCount}}</label> <br>
+                    <span style="font-weight: 600; color: white;">Total Amount:</span> <label id="amountDisplay">{{defaultAmount}}</label>
                 </div>
                 <br>
 
@@ -361,42 +424,94 @@ function shareViaWhatsApp() {
         </div>
     </div>
 <script>
+    // document.getElementById("FromDate").addEventListener("change", function () {
+    //     const selectedValue = this.value;
+    //     const dynamicCell = document.getElementById("year");
 
-function shareViaGmail() {
-                    var FromDate = document.getElementById('in1').value;
-                    var ToDate = document.getElementById('in2').value;
-                    // Collect data from the table or any other relevant information
-                    if (FromDate == '' && ToDate == ''){
-                       // Collect data from the table or any other relevant information
-                        var tableData = getTableData(); // Implement the function to fetch table data
 
-                    // Create email subject and body
-                    var emailSubject = "Recurring Bill Details";
-                    var emailBody = "Check out the Recurring Bill Details:\n" + tableData;
+    //     dynamicCell.innerHTML = selectedValue;
+    //     document.getElementById("id1").innerHTML = selectedValue;
+    //     document.getElementById("externalDataInput").value = selectedValue;
+    // });
 
-                    // Create a mailto link with subject and body for Gmail
-                    var gmailLink = "https://mail.google.com/mail/?view=cm&fs=1&to=&su=" + encodeURIComponent(emailSubject) + "&body=" + encodeURIComponent(emailBody);
+// function shareViaGmail() {
+//                     var FromDate = document.getElementById('in1').value;
+//                     var ToDate = document.getElementById('in2').value;
+//                     // Collect data from the table or any other relevant information
+//                     if (FromDate == '' && ToDate == ''){
+//                        // Collect data from the table or any other relevant information
+//                         var tableData = getTableData(); // Implement the function to fetch table data
 
-                    // Open the link in a new tab or window
-                    window.open(gmailLink, "_blank");
-                    }
-                    else{
-                        // Collect data from the table or any other relevant information
-                        var tableData = getFilteredTableData(); // Implement the function to fetch table data
+//                     // Create email subject and body
+//                     var emailSubject = "Recurring Bill Details";
+//                     var emailBody = "Check out the Recurring Bill Details:\n" + tableData;
 
-                    // Create email subject and body
-                    var emailSubject = "Recurring Bill Details";
-                    var emailBody = "Check out the Recurring Bill Details:\n" + tableData;
+//                     // Create a mailto link with subject and body for Gmail
+//                     var gmailLink = "https://mail.google.com/mail/?view=cm&fs=1&to=&su=" + encodeURIComponent(emailSubject) + "&body=" + encodeURIComponent(emailBody);
 
-                    // Create a mailto link with subject and body for Gmail
-                    var gmailLink = "https://mail.google.com/mail/?view=cm&fs=1&to=&su=" + encodeURIComponent(emailSubject) + "&body=" + encodeURIComponent(emailBody);
+//                     // Open the link in a new tab or window
+//                     window.open(gmailLink, "_blank");
+//                     }
+//                     else{
+//                         // Collect data from the table or any other relevant information
+//                         var tableData = getFilteredTableData(); // Implement the function to fetch table data
 
-                    // Open the link in a new tab or window
-                    window.open(gmailLink, "_blank");
-                }
-                }
+//                     // Create email subject and body
+//                     var emailSubject = "Recurring Bill Details";
+//                     var emailBody = "Check out the Recurring Bill Details:\n" + tableData;
 
-    
+//                     // Create a mailto link with subject and body for Gmail
+//                     var gmailLink = "https://mail.google.com/mail/?view=cm&fs=1&to=&su=" + encodeURIComponent(emailSubject) + "&body=" + encodeURIComponent(emailBody);
+
+//                     // Open the link in a new tab or window
+//                     window.open(gmailLink, "_blank");
+//                 }
+//                 }
+
+
+// document.getElementById('generateAndSendPdf').addEventListener('click', function () {
+//     // Get the HTML content of the table
+//     const tableContent = document.getElementById('pdf-card').outerHTML;
+
+//     // Convert the HTML to PDF
+//     html2pdf().from(tableContent).outputPdf().then(function (pdf) {
+//       // Convert the PDF to a data URL
+//       const pdfDataUrl = URL.createObjectURL(new Blob([pdf], { type: 'application/pdf' }));
+
+//       // Send the PDF via email using a server-side endpoint
+//       sendEmailWithAttachment(pdfDataUrl);
+//     });
+//   });
+
+//   function sendEmailWithAttachment(pdfDataUrl) {
+//     var email_id = document.getElementById('email_ids').value
+//     // Perform a fetch request to your server endpoint
+//     // Include necessary data in the request (pdfDataUrl, recipient email, etc.)
+//     // Example using Fetch API:
+//     console.log('fetch');
+//     fetch('send_pdf_email', {
+//       method: 'POST',
+//       headers: {
+//         'Content-Type': 'application/json',
+//       },
+//       body: JSON.stringify({
+//         pdfDataUrl: pdfDataUrl,
+//         recipientEmail: email_id, // Replace with the actual recipient email
+//         emailMessage: 'Recurring bill reports.',
+//       }),
+//     })
+//       .then(response => {
+//         if (response.ok) {
+//           Swal.fire('Email Sent', 'Your email has been sent successfully!', 'success');
+//         } else {
+//           Swal.fire('Error', 'Failed to send email.', 'error');
+//         }
+//       })
+//       .catch(error => {
+//         console.error('Error:', error);
+//         Swal.fire('Error', 'An error occurred while sending the email.', 'error');
+//       });
+//   }
 
 
 
@@ -416,6 +531,9 @@ function filterTable() {
 
     const fromDate = new Date(document.getElementById('in1').value);
     const toDate = new Date(document.getElementById('in2').value);
+
+    document.getElementById("date1").value = fromDate.getFullYear() + '-' + padZero(fromDate.getMonth() + 1) + '-' + padZero(fromDate.getDate());
+    document.getElementById("date2").value = toDate.getFullYear() + '-' + padZero(fromDate.getMonth() + 1) + '-' + padZero(fromDate.getDate());
 
     // Set the time component of toDate to the end of the day
     toDate.setHours(23, 59, 59, 999);

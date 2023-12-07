@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'app1',
     'django_social_share',
     'mathfilters',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
@@ -59,6 +60,11 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
+]
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:your_frontend_port",  # Replace with your actual frontend URL
 ]
 
 ROOT_URLCONF = 'infoxfinsys.urls'

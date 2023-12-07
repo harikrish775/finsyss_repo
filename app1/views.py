@@ -50,6 +50,7 @@ from collections import defaultdict
 import re
 from django.db import connection
 from django.views.decorators.csrf import csrf_exempt
+from django.core.mail import EmailMessage
 
 
 def index(request):
@@ -33382,7 +33383,7 @@ def createvendor(request):
             title=request.POST['title']
             first_name = request.POST['firstname'].replace(" ", "")
             last_name = request.POST['lastname'].replace(" ", "")
-            cmpnm=request.POST['company_name']
+            cmpnm=request.POST['cname']
             email=request.POST['email']
             website=request.POST['website']
             mobile=request.POST['mobile']
@@ -33668,7 +33669,7 @@ def editvendor(request,id):
             vndr.title = request.POST['title']
             vndr.firstname=request.POST['firstname']
             vndr.lastname=request.POST['lastname']
-            vndr.companyname=request.POST['company_name']
+            vndr.companyname=request.POST['cname']
             vndr.email=request.POST['email']
             vndr.website=request.POST['website']
             vndr.mobile=request.POST['mobile']
@@ -33722,7 +33723,7 @@ def createvendor1(request):
             title=request.POST['title']
             first_name=request.POST['firstname'].replace(" ", "")
             last_name=request.POST['lastname'].replace(" ", "")
-            cmpnm=request.POST['company_name']
+            cmpnm=request.POST['cname']
             email=request.POST['email']
             website=request.POST['website']
             mobile=request.POST['mobile']
@@ -33775,7 +33776,7 @@ def createvendor2(request):
             title=request.POST['title']
             first_name=request.POST['firstname'].replace(" ", "")
             last_name=request.POST['lastname'].replace(" ", "")
-            cmpnm=request.POST['company_name']
+            cmpnm=request.POST['cname']
             email=request.POST['email']
             website=request.POST['website']
             mobile=request.POST['mobile']
@@ -33829,7 +33830,7 @@ def createvendor3(request):
             title=request.POST['title']
             first_name=request.POST['firstname'].replace(" ", "")
             last_name=request.POST['lastname'].replace(" ", "")
-            cmpnm=request.POST['company_name']
+            cmpnm=request.POST['cname']
             email=request.POST['email']
             website=request.POST['website']
             mobile=request.POST['mobile']
@@ -33875,7 +33876,7 @@ def createvendor4(request):
             title=request.POST['title']
             first_name=request.POST['firstname'].replace(" ", "")
             last_name=request.POST['lastname'].replace(" ", "")
-            cmpnm=request.POST['company_name']
+            cmpnm=request.POST['cname']
             email=request.POST['email']
             website=request.POST['website']
             mobile=request.POST['mobile']
@@ -39006,7 +39007,7 @@ def customers21(request):
             cust = customer(title=request.POST.get('title'), 
                             firstname=firstname,
                             lastname=lastname, 
-                            company=request.POST.get('company_name'),
+                            company=request.POST.get('cname'),
                             location=request.POST.get('location'),
                             placesupply=request.POST.get('placesupply'),
                             gsttype=request.POST.get('gsttype'),
@@ -39774,7 +39775,7 @@ def recurexpense_vendor(request):
             title=request.POST['title']
             first_name=request.POST['firstname']
             last_name=request.POST['lastname']
-            cmpnm=request.POST['company_name']
+            cmpnm=request.POST['cname']
             email=request.POST['email']
             website=request.POST['website']
             mobile=request.POST['mobile']
@@ -40088,7 +40089,7 @@ def recurexpense_vendor(request):
             title=request.POST['title']
             first_name=request.POST['firstname']
             last_name=request.POST['lastname']
-            cmpnm=request.POST['company_name']
+            cmpnm=request.POST['cname']
             email=request.POST['email']
             website=request.POST['website']
             mobile=request.POST['mobile']
@@ -45538,7 +45539,7 @@ def createvendor_rbill(request):
             title=request.POST['title']
             first_name = request.POST['firstname'].replace(" ", "")
             last_name = request.POST['lastname'].replace(" ", "")
-            cmpnm=request.POST['company_name']
+            cmpnm=request.POST['cname']
             email=request.POST['email']
             website=request.POST['website']
             mobile=request.POST['mobile']
@@ -51418,7 +51419,12 @@ def purchase_orderby_vendor(request):
     vendr = vendor.objects.all()
     # vendordetails = purchaseorder.objects.values('vendor_name').distinct()
     vendordetails = purchaseorder.objects.values('vendor_name','vendor_mail').annotate(number_of_orders=Count('vendor_balance'),total_amount=Sum('grand_total'))
-    return render(request, 'app1/purchase_orderby_vendor.html', {'vendordetails': vendordetails,'vendor':vendr,'cmp1':cmp1})
+    defaultCount = purchaseorder.objects.all().count()
+    purchaseamount = purchaseorder.objects.all()
+    defaultAmount = 0
+    for i in purchaseamount:
+        defaultAmount += int(i.grand_total)
+    return render(request, 'app1/purchase_orderby_vendor.html', {'vendordetails': vendordetails,'vendor':vendr,'cmp1':cmp1,'defaultCount':defaultCount,'defaultAmount':defaultAmount})
 
 def recurring_bill_report(request):
     cmp1 = company.objects.get(id=request.user)
@@ -51429,5 +51435,73 @@ def recurring_bill_report(request):
         defaultAmount += i.paid_amount
     return render(request,'app1/recurring_bill_report.html',{'cmp1':cmp1,'recur':recur,'defaultCount':defaultCount,'defaultAmount':defaultAmount})
     
-    
+def recurring_bill_report_pdf(request):
+    return render(request,'app1/recurring_bill_report_pdf.html')
+
+def recurringBillDetailsToEmail(request):
+    if request.user:
+        try:
+            if request.method == 'POST':
+                emails_string = request.POST['email_ids']
+                fromdate =  request.POST['FromD']
+                todate = request.POST['ToD']
+
+                # Split the string by commas and remove any leading or trailing whitespace
+                emails_list = [email.strip() for email in emails_string.split(',')]
+                email_message = request.POST['email_message']
+                
+
+                cmp = company.objects.get( id_id = request.user.id)
+                print(cmp)
+                data = recurring_bill.objects.filter(start_date__gt = fromdate,start_date__lt = todate)
+                # data = recurring_bill.objects.all()
+                        
+                context = {'cmp': cmp,'data': data,'email_message':email_message}
+                template_path = 'recurring_bill_report_pdf.html'
+                template = get_template(template_path)
+
+                html  = template.render(context)
+                result = BytesIO()
+                pdf = pisa.pisaDocument(BytesIO(html.encode("ISO-8859-1")), result)#, link_callback=fetch_resources)
+                pdf = result.getvalue()
+                filename = f'Godown Report - {cmp.cname}.pdf'
+                subject = f"Godown Report - {cmp.cname}"
+                email = EmailMessage(subject, f"Hi,\nPlease find the attached Recurring Bill Report -of -{cmp.cname}. \n{email_message}\n\n--\nRegards,\n{cmp.cname}\n{cmp.address}\n{cmp.state} - {cmp.country}\n{cmp.contact_number}", from_email=settings.EMAIL_HOST_USER,to=emails_list)
+                email.attach(filename, pdf, "application/pdf")
+                email.send(fail_silently=False)
+
+                msg = messages.success(request, 'Report has been shared via email successfully..!')
+                return redirect('recurring_bill_report_pdf')
+        except Exception as e:
+            print(e)
+            messages.error(request, f'{e}')
+            return redirect('recurring_bill_report_pdf')  
+
+# def send_pdf_email(request):
+#     if request.method == 'POST':
+#         data = request.POST
+#         pdf_data_url = data.get('pdfDataUrl', '')
+#         recipient_email = data.get('recipientEmail', '')
+#         email_message = data.get('emailMessage', '')
+
+#         # Convert data URL to bytes
+#         pdf_data = pdf_data_url.split(',')[1]
+#         pdf_bytes = bytes(pdf_data, 'utf-8')
+
+#         # Attach PDF to email
+#         email = EmailMessage(
+#             'Recurring bill reports.',
+#             'Body of the Email',
+#             'your.email@gmail.com',
+#             [recipient_email],
+#         )
+#         email.attach('example.pdf', pdf_bytes, 'application/pdf')
+
+#         # Send email
+#         try:
+#             email.send()
+#             return JsonResponse({'success': True})
+#         except Exception as e:
+#             return JsonResponse({'success': False, 'error_message': str(e)})
+
 #--------End-----------------------
