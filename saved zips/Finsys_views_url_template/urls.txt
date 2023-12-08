@@ -1,0 +1,8 @@
+
+____new-urls_________
+
+path('recurringBillDetailsToEmail',views.recurringBillDetailsToEmail,name="recurringBillDetailsToEmail"),
+
+path('purchaseOrderByVendorToEmail',views.purchaseOrderByVendorToEmail,name="purchaseOrderByVendorToEmail"),
+
+path('purchaseOrderDetailsToEmail',views.purchaseOrderDetailsToEmail,name="purchaseOrderDetailsToEmail")

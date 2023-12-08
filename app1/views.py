@@ -51407,8 +51407,8 @@ def paymentDraftToSave(request, id):
 
 def purchase_order_details(request):
     cmp1 = company.objects.get(id=request.user)
-    details = purchaseorder.objects.all()
-    defaultCount = purchaseorder.objects.all().count()
+    details = purchaseorder.objects.filter(cid_id = request.user.id)
+    defaultCount = purchaseorder.objects.filter(cid_id = request.user.id).count()
     defaultAmount=0
     for i in details:
         defaultAmount += int(i.grand_total)
@@ -51416,11 +51416,11 @@ def purchase_order_details(request):
 
 def purchase_orderby_vendor(request):
     cmp1 = company.objects.get(id=request.user)
-    vendr = vendor.objects.all()
+    vendr = vendor.objects.filter(cid_id = request.user.id)
     # vendordetails = purchaseorder.objects.values('vendor_name').distinct()
-    vendordetails = purchaseorder.objects.values('vendor_name','vendor_mail').annotate(number_of_orders=Count('vendor_balance'),total_amount=Sum('grand_total'))
-    defaultCount = purchaseorder.objects.all().count()
-    purchaseamount = purchaseorder.objects.all()
+    vendordetails = purchaseorder.objects.filter(cid_id=request.user.id).values('vendor_name','vendor_mail').annotate(number_of_orders=Count('vendor_balance'),total_amount=Sum('grand_total'))
+    defaultCount = purchaseorder.objects.filter(cid_id=request.user.id).count()
+    purchaseamount = purchaseorder.objects.filter(cid_id=request.user.id)
     defaultAmount = 0
     for i in purchaseamount:
         defaultAmount += int(i.grand_total)
@@ -51428,8 +51428,8 @@ def purchase_orderby_vendor(request):
 
 def recurring_bill_report(request):
     cmp1 = company.objects.get(id=request.user)
-    recur = recurring_bill.objects.all()
-    defaultCount = recurring_bill.objects.all().count()
+    recur = recurring_bill.objects.filter(cid_id=request.user.id)
+    defaultCount = recurring_bill.objects.filter(cid_id=request.user.id).count()
     defaultAmount = 0
     for i in recur:
         defaultAmount += i.paid_amount
@@ -51444,9 +51444,10 @@ def recurringBillDetailsToEmail(request):
                     todate = request.POST['ToD']
                     emails_string = request.POST['email_ids']
                     if fromdate == '' and todate == '' :
-                        data = recurring_bill.objects.filter(start_date__gte=fromdate, start_date__lte=todate)
+                        data = recurring_bill.objects.filter(cid_id=request.user.id)
                     else:
-                        data = recurring_bill.objects.all()
+                        data = recurring_bill.objects.filter(cid_id=request.user.id,start_date__gte=fromdate, start_date__lte=todate)
+                        
 
                     # Split the string by commas and remove any leading or trailing whitespace
                     emails_list = [email.strip() for email in emails_string.split(',')]
@@ -51490,13 +51491,13 @@ def purchaseOrderByVendorToEmail(request):
     if request.user:
             try:
                 if request.method == 'POST':
-                    # fromdate = request.POST['FromD']
-                    # todate = request.POST['ToD']
+                    fromdate = request.POST['FromD']    
+                    todate = request.POST['ToD']
                     emails_string = request.POST['email_ids']
-                    # if fromdate == '' and todate == '' :
-                    #     data = purchaseorder.objects.filter(start_date__gte=fromdate, start_date__lte=todate)
-                    # else:
-                    data = purchaseorder.objects.values('vendor_name','vendor_mail').annotate(number_of_orders=Count('vendor_balance'),total_amount=Sum('grand_total'))
+                    if fromdate == '' and todate == '' :
+                        data = recurring_bill.objects.filter(cid_id=request.user.id)
+                    else:
+                        data = recurring_bill.objects.filter(cid_id=request.user.id,start_date__gte=fromdate, start_date__lte=todate)
 
                     # Split the string by commas and remove any leading or trailing whitespace
                     emails_list = [email.strip() for email in emails_string.split(',')]
@@ -51539,13 +51540,13 @@ def purchaseOrderDetailsToEmail(request):
     if request.user:
             try:
                 if request.method == 'POST':
-                    # fromdate = request.POST['FromD']
-                    # todate = request.POST['ToD']
+                    fromdate = request.POST['FromD']
+                    todate = request.POST['ToD']
                     emails_string = request.POST['email_ids']
-                    # if fromdate == '' and todate == '' :
-                    #     data = purchaseorder.objects.filter(start_date__gte=fromdate, start_date__lte=todate)
-                    # else:
-                    data = purchaseorder.objects.all()
+                    if fromdate == '' and todate == '' :
+                        data = recurring_bill.objects.filter(cid_id=request.user.id)
+                    else:
+                        data = recurring_bill.objects.filter(cid_id=request.user.id,start_date__gte=fromdate, start_date__lte=todate)
 
                     # Split the string by commas and remove any leading or trailing whitespace
                     emails_list = [email.strip() for email in emails_string.split(',')]

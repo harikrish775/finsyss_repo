@@ -1,0 +1,28 @@
+______templates_______
+
+purchase_order_details - (replace)
+purchase_orderby_vendor - (replace)
+recurring_bill_report - (replace)
+
+purchase_order_details_pdf - (new)
+purchase_orderby_vendor_pdf - (new)
+recurring_bill_report_pdf - (new)
+
+_______views_______
+
+purchase_order_details - (replace)
+purchase_orderby_vendor - (replace)
+recurring_bill_report - (replace)
+
+purchaseOrderDetailsToEmail - (new)
+purchaseOrderByVendorToEmail - (new)
+recurringBillDetailsToEmail - (new)
+
+_______urls- (NEW)__________
+
+path('recurringBillDetailsToEmail',views.recurringBillDetailsToEmail,name="recurringBillDetailsToEmail"),
+
+path('purchaseOrderByVendorToEmail',views.purchaseOrderByVendorToEmail,name="purchaseOrderByVendorToEmail"),
+
+path('purchaseOrderDetailsToEmail',views.purchaseOrderDetailsToEmail,name="purchaseOrderDetailsToEmail")
+

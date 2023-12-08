@@ -274,68 +274,63 @@ function shareViaWhatsApp() {
 
              
                 function exportAsPDF() {
-    const container = document.getElementById('pdf-card');
-
-    // Save the original background color
-    const originalBackgroundColor = container.style.backgroundColor;
-
-    // Set the container's background color to white
-    container.style.backgroundColor = 'white';
-
-    // Apply styling changes to the container's content
-    const textWhiteElements = container.querySelectorAll('.text');
-    textWhiteElements.forEach(element => {
-        element.style.color = 'black'; // Set text color to black
-    });
-
-    const tableElements = container.querySelectorAll('table');
-    const tableCells = container.querySelectorAll('td, th');
-    const tableRows = container.querySelectorAll('tr');
-
-    tableElements.forEach(table => {
-        table.style.backgroundColor = '#ffffff'; // Set background color to white
-        table.style.color = '#000000'; // Set text color to black
-    });
-
-    tableCells.forEach(cell => {
-        cell.style.backgroundColor = '#ffffff'; // Set background color to white
-        cell.style.color = '#000000'; // Set text color to black
-        cell.style.border = '1px solid black'; // Add a black border
-    });
-
-    tableRows.forEach(row => {
-        row.style.backgroundColor = '#000000'; // Set background color to black
-    });
-
-    const pdfOptions = {
+            const container = document.getElementById('pdf-card');
+        
+            // Save the original background color
+            const originalBackgroundColor = container.style.backgroundColor;
+        
+            // Set the container's background color to white
+            container.style.backgroundColor = 'white';
+        
+            // Apply styling changes to the container's content
+            const textWhiteElements = container.querySelectorAll('.text');
+            textWhiteElements.forEach(element => {
+            element.style.color = 'black'; // Set text color to black
+            });
+        
+            const tableElements = container.querySelectorAll('table');
+            const tableCells = container.querySelectorAll('td, th');
+            const tableRows = container.querySelectorAll('tr');
+        
+            tableElements.forEach(table => {
+            table.style.backgroundColor = '#ffffff'; // Set background color to white
+            table.style.color = '#000000'; // Set text color to black
+            });
+        
+            tableCells.forEach(cell => {
+            cell.style.backgroundColor = '#ffffff'; // Set background color to white
+            cell.style.color = '#000000'; // Set text color to black
+            cell.style.border = '1px solid black'; // Add a black border
+            });
+        
+            tableRows.forEach(row => {
+            row.style.backgroundColor = '#000000'; // Set background color to black
+            });
+        
+            const pdfOptions = {
         margin: 0,
         filename: '{{cmp1.cname}}_Recurring_Bill_Details.pdf',
         image: { type: 'jpeg', quality: 1 },
         html2canvas: { scale: 2 },
         jsPDF: { unit: 'mm', format: 'a3', orientation: 'portrait' }, // Adjust format and orientation
-    };
+        };
 
-    // Generate PDF from the container
-    html2pdf().from(container).set(pdfOptions).save().then(() => {
-
-        // Restore the original background color
-        container.style.backgroundColor = '#243e54';
-
-        textWhiteElements.forEach(element => {
-            element.style.color = 'white'; // Restore original text color
-        });
-
-        tableCells.forEach(cell => {
-        cell.style.backgroundColor = '#243e54'; // Set background color to white
-        cell.style.color = 'white'; // Set text color to black
-        cell.style.border = '1px solid gray'; // Add a black border
-    });
-        // Remove the pdf-background class after generating the PDF
-        container.classList.remove('pdf-background');
         
-    });
-}
+            // Generate PDF from the container
+            html2pdf().from(container).set(pdfOptions).save().then(() => {
 
+            // Restore the original background color
+            container.style.backgroundColor = originalBackgroundColor;
+
+            textWhiteElements.forEach(element => {
+                element.style.color = 'white'; // Restore original text color
+
+            // Remove the pdf-background class after generating the PDF
+            container.classList.remove('pdf-background');
+            });
+            window.location.reload();
+            });
+        }
 
 
 
@@ -380,12 +375,12 @@ function shareViaWhatsApp() {
                 event.preventDefault();
 
 
-                const pdfCard = document.getElementById('myTable').cloneNode(true);
+                const pdfCard = document.getElementById('pdf-card').cloneNode(true);
 
                 // Create a new window for printing
                 const printWindow = window.open('', '');
                 pdfCard.style.color = 'black';
-                pdfCard.style.backgroundColor = 'white';
+                pdfCard.style.backgroundColor = '#243e54';
                 const pageTitle = printWindow.document.createElement('h1');
                 pageTitle.textContent = 'RECURRING BILL REPORTS'; // Replace 'Page Title' with your desired title text
                 pageTitle.style.textAlign = 'center';
@@ -411,7 +406,6 @@ function shareViaWhatsApp() {
                 const table = printWindow.document.querySelector('#pdf-card table'); // Adjust the selector based on your table structure
                 if (table) {
                     table.style.margin = 'auto';
-                    table.style.width = '100%';
                 }
 
                 // Trigger the print dialog for the new window

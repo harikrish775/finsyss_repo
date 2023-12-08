@@ -4,8 +4,6 @@
 {% if user.is_authenticated %}
 <!-- Include jQuery -->
 <!-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> -->
-<script src="https://cdn.emailjs.com/dist/email.min.js"></script>
-
 
 
 <!-- Include jQuery.table2excel plugin -->
@@ -76,7 +74,7 @@
             <div class="card-title">
                 <center>
                     <h6>{{cmp1.cname}}</h6>
-                    <h2 class="mb-0">PURCHASE ORDER DETAILS</h2>
+                    <h2 class="mb-0">PURCHASE ORDER BY <span id="vendorName">VENDOR</span></h2>
                     <div class="display">
                         <div id="d1" style="display: inline-block;"></div>
                         <div id="d2" style="display: inline-block;"></div>
@@ -94,24 +92,53 @@
                 <div class=" left">
                     <div class="px-2">
                         <label style="text-align:left ">From</label><br>
-                        <input name="FromDate" class="inputdate form-control" onchange="filterTable()" id="in1" type="date">
+                        <input name="FromDate" class="inputdate form-control" id="in1" type="date">
                     </div>
                     <div class="px-2">
                         <label style="text-align:left ">To</label><br>
-                        <input name="ToDate" class="inputdate form-control" onchange="filterTable()" id="in2" type="date">
+                        <input name="ToDate" class="inputdate form-control" id="in2" type="date">
                     </div>
 
                 </div>
 
             </div>
             <div class="bar pt-4 px-2">
-                <!-- <div class="left ">
-                    <a class="btn btn-outline-info" onclick="filterTable('All')" role="button"><i class="fa fa-filter"></i> Filter By Date </a>
+                <div class="left ">
+                    <label for="">Filter By Vendor</label><br>
+                    <div class="flex-grow-1 search-bar" >
+                        <div class="input-group" style="left: -40px;">
+                          <div class="input-group-prepend search-arrow-back">
+                            <button class="btn btn-search-back" type="button"><i class="bx bx-arrow-back"></i>
+                            </button>
+                          </div>
+                          <input type="text" autocomplete="off" id="myInput1" onkeyup="filter(this);" onclick="myFunction1()"
+                            class="form-control" placeholder="search"  />
+                          <!-- <div class="input-group-append">
+                            <button class="btn btn-search" type="button"><i class="lni lni-search-alt"></i>
+                            </button>
+                          </div> -->
+                          <div class=" mt-5 " id="myDIV" style="z-index:1;position:absolute; 
+                          background-color: #213b52;width:220px;height:1px;">
+            
+                            <ul id="myList1" class="one" style="background-color: #213b52;">
+                                {% for v in vendor %}
+                              <li style="cursor: pointer;" onclick="filterTable('{{v.firstname}} {{v.lastname}}')">{{v.firstname}} {{v.lastname}}</li>
+                                {% endfor %}
+            
+                            </ul>
+                          </div>
+            
+            
+            
+                        </div>
+                      </div>
+                   
                     
-                </div> -->
-                <div class="right ml-auto" >
+                </div>
 
-                    <button class="btn btn_pdf btn-outline-info" onclick="exportAsPDF()">pdf</button>
+                <div class="right">
+
+                    <button class="btn btn_pdf btn-outline-info" id="btn_pdf" onclick="exportAsPDF()">pdf</button>
                     <button class="btn btn_print btn-outline-info">Print</button>
                     <button class=" btn btn-outline-info" id="export-button" onclick="exportAsExcel()">Excel</button>
                     <button class="btn btn-outline-info dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -133,7 +160,7 @@
                             </div>
                             <div class="modal-body" style="background: #243e54;">
                               <div class="card p-3 m-3">
-                                <form action="{% url 'purchaseOrderDetailsToEmail' %}" method="post" class="needs-validation"
+                                <form action="{% url 'purchaseOrderByVendorToEmail' %}" method="post" class="needs-validation"
                                   id="share_to_email_form" autocomplete="off">
                                   {% csrf_token %}
                                   <input name="FromD" class="inputdate form-control"  id="date1"  type="date" hidden >
@@ -170,123 +197,132 @@
     </div>
     <script>
 
-
-
-function shareViaGmail() {
-    // Collect data from the table or any other relevant information
-    var tableData = getTableData(); // Implement the function to fetch table data
-
-    // Create email subject and body
-    var emailSubject = "Recurring Bill Details";
-    var emailBody = "Check out the Recurring Bill Details:\n" + tableData;
-
-    // Create a mailto link with subject and body for Gmail
-    var gmailLink = "https://mail.google.com/mail/?view=cm&fs=1&to=&su=" + encodeURIComponent(emailSubject) + "&body=" + encodeURIComponent(emailBody);
-
-    // Open the link in a new tab or window
-    window.open(gmailLink, "_blank");
-}
-
-function getTableData() {
-    // Implement this function to fetch and format your table data
-    // You can iterate through the table rows and cells to collect the necessary information
-    // Return a formatted string containing the data you want to share
-    var table = document.getElementById('myTable');
-    var data = "";
-    // Example: Iterate through rows and cells
-    for (var i = 0; i < table.rows.length; i++) {
-        for (var j = 0; j < table.rows[i].cells.length; j++) {
-            data += table.rows[i].cells[j].textContent + "\t";
-        }
-        data += "\n";
-    }
-    return data;
-}
-
-
-
-
-
-
-
 function exportAsPDF() {
-    const container = document.getElementById('pdf-card');
-
-    // Save the original background color
-    const originalBackgroundColor = container.style.backgroundColor;
-
-    // Set the container's background color to white
-    container.style.backgroundColor = 'white';
-
-    // Apply styling changes to the container's content
-    const textWhiteElements = container.querySelectorAll('.text');
-    textWhiteElements.forEach(element => {
-        element.style.color = 'black'; // Set text color to black
-    });
-
-    const tableElements = container.querySelectorAll('table');
-    const tableCells = container.querySelectorAll('td, th');
-    const tableRows = container.querySelectorAll('tr');
-
-    tableElements.forEach(table => {
-        table.style.backgroundColor = '#ffffff'; // Set background color to white
-        table.style.color = '#000000'; // Set text color to black
-    });
-
-    tableCells.forEach(cell => {
-        cell.style.backgroundColor = '#ffffff'; // Set background color to white
-        cell.style.color = '#000000'; // Set text color to black
-        cell.style.border = '1px solid black'; // Add a black border
-    });
-
-    tableRows.forEach(row => {
-        row.style.backgroundColor = '#000000'; // Set background color to black
-    });
-
-    const pdfOptions = {
+            const container = document.getElementById('pdf-card');
+        
+            // Save the original background color
+            const originalBackgroundColor = container.style.backgroundColor;
+        
+            // Set the container's background color to white
+            container.style.backgroundColor = 'white';
+        
+            // Apply styling changes to the container's content
+            const textWhiteElements = container.querySelectorAll('.text');
+            textWhiteElements.forEach(element => {
+            element.style.color = 'black'; // Set text color to black
+            });
+        
+            const tableElements = container.querySelectorAll('table');
+            const tableCells = container.querySelectorAll('td, th');
+            const tableRows = container.querySelectorAll('tr');
+        
+            tableElements.forEach(table => {
+            table.style.backgroundColor = '#ffffff'; // Set background color to white
+            table.style.color = '#000000'; // Set text color to black
+            });
+        
+            tableCells.forEach(cell => {
+            cell.style.backgroundColor = '#ffffff'; // Set background color to white
+            cell.style.color = '#000000'; // Set text color to black
+            cell.style.border = '1px solid black'; // Add a black border
+            });
+        
+            tableRows.forEach(row => {
+            row.style.backgroundColor = '#000000'; // Set background color to black
+            });
+        
+            const pdfOptions = {
         margin: 0,
-        filename: '{{cmp1.cname}}_Purchase_Order_Details.pdf',
+        filename: '{{cmp1.cname}}_Purchase_Orderby_Vendor.pdf',
         image: { type: 'jpeg', quality: 1 },
         html2canvas: { scale: 2 },
         jsPDF: { unit: 'mm', format: 'a3', orientation: 'portrait' }, // Adjust format and orientation
-    };
-
-    // Generate PDF from the container
-    html2pdf().from(container).set(pdfOptions).save().then(() => {
-
-        // Restore the original background color
-        container.style.backgroundColor = '#243e54';
-
-        textWhiteElements.forEach(element => {
-            element.style.color = 'white'; // Restore original text color
-        });
-
-        tableCells.forEach(cell => {
-        cell.style.backgroundColor = '#243e54'; // Set background color to white
-        cell.style.color = 'white'; // Set text color to black
-        cell.style.border = '1px solid gray'; // Add a black border
-    });
-        // Remove the pdf-background class after generating the PDF
-        container.classList.remove('pdf-background');
-        
-    });
-}
-
-
-
-
+        };
 
         
+            // Generate PDF from the container
+            html2pdf().from(container).set(pdfOptions).save().then(() => {
 
-       
-                        
-                
-                function shareViaWhatsApp() {
+            // Restore the original background color
+            container.style.backgroundColor = originalBackgroundColor;
+
+            textWhiteElements.forEach(element => {
+                element.style.color = 'white'; // Restore original text color
+
+            // Remove the pdf-background class after generating the PDF
+            container.classList.remove('pdf-background');
+            });
+            window.location.reload();
+            });
+        }
+
+$(document).ready(function () {
+      $("#myList1 li").hide();
+
+      $("#myInput1").on("keyup", function () {
+
+        var value = $(this).val().toLowerCase();
+        if (value !== '') {
+          $("#myList1 li").filter(function () {
+            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+          });
+        } else {
+          $("#myList1 li").hide();
+        }
+      });
+    });
+
+
+// function filterTable(filterValue) {
+//     const table = document.getElementById('myTable');
+//     const rows = table.getElementsByTagName('tr');
+//     let count = 0;
+//     let totalAmount = 0;
+
+//     const fromDate = new Date(document.getElementById('in1').value);
+//     const toDate = new Date(document.getElementById('in2').value);
+
+//     // Set the time component of toDate to the end of the day
+//     toDate.setHours(23, 59, 59, 999);
+
+//     for (let i = 2; i < rows.length; i++) {
+//         const row = rows[i];
+//         const nameCell = row.cells[0]; // Assuming name is in the first column
+//         const dateCell = new Date(row.cells[1].textContent); // Assuming date is in the second column
+//         const amountCell = parseFloat(row.cells[6].textContent); // Assuming amount is in the seventh column
+
+//         // Set the time component of dateCell to the end of the day
+//         dateCell.setHours(23, 59, 59, 999);
+
+//         if (filterValue === 'All' || nameCell.textContent === filterValue) {
+//             if (fromDate <= dateCell && dateCell <= toDate) {
+//                 count = count + 1;
+//                 totalAmount += amountCell;
+//                 row.style.display = 'table-row';
+//             } else {
+//                 row.style.display = 'none';
+//             }
+//         } else {
+//             row.style.display = 'none';
+//         }
+//     }
+
+//     // Update the count and total amount in HTML
+//     document.getElementById('countDisplay').textContent = count;
+//     document.getElementById('amountDisplay').textContent = totalAmount.toFixed(2);
+// }
+
+
+
+
+
+
+        function shareViaWhatsApp() {
                     // Collect data from the table or any other relevant information
                     var tableData = getTableData(); // Implement the function to fetch table data
 
                     // Create a message to be shared on WhatsApp
-                    var message = "Check out the Purchase Order Details:\n" + tableData;
+                    var message = "Check out the Recurring Bill Details:\n" + tableData;
 
                     // Create a link with the WhatsApp API format
                     var whatsappLink = "https://wa.me/?text=" + encodeURIComponent(message);
@@ -294,7 +330,6 @@ function exportAsPDF() {
                     // Open the link in a new tab or window
                     window.open(whatsappLink, "_blank");
                 }
-
                 function getTableData() {
                     // Implement this function to fetch and format your table data
                     // You can iterate through the table rows and cells to collect the necessary information
@@ -311,96 +346,103 @@ function exportAsPDF() {
                     return data;
                 }
 
-                function filterTable() {
-    const table = document.getElementById('myTable');
-    const rows = table.getElementsByTagName('tr');
-    let count = 0;
-    let totalAmount = 0;
+ 
+                function filterTable(filterValue) {
+                document.getElementById('vendorName').textContent = filterValue;
+                const table = document.getElementById('myTable');
+                const rows = table.getElementsByTagName('tr');
+                let count = 0;
+                let totalAmount = 0;
+                
 
-    
-    const fromDate = new Date(document.getElementById('in1').value);
-    const toDate = new Date(document.getElementById('in2').value);
-    if(fromDate === '' || toDate === ''){
-        
-    }else{
-        var formattedDate1 = toDate.toISOString().split('T')[0];
-        var formattedDate2 = fromDate.toISOString().split('T')[0];
-    }
-    
+                
+                const fromDate = new Date(document.getElementById('in1').value);
+                const toDate = new Date(document.getElementById('in2').value);
+                if(fromDate === '' || toDate === ''){
+                    
+                }else{
+                    var formattedDate1 = toDate.toISOString().split('T')[0];
+                    var formattedDate2 = fromDate.toISOString().split('T')[0];
+                }
+                
 
-    document.getElementById("date1").value = formattedDate2;
-    document.getElementById("date2").value = formattedDate1;
+                document.getElementById("date1").value = formattedDate2;
+                document.getElementById("date2").value = formattedDate1;
 
-    // Set the time component of toDate to the end of the day
-    toDate.setHours(23, 59, 59, 999);
+                // Set the time component of toDate to the end of the day
+                toDate.setHours(23, 59, 59, 999);
 
-    // Check if only one date field is filled
-    if (fromDate && !toDate) {
-        for (let i = 2; i < rows.length; i++) {
-            const row = rows[i];
-            const dateCell = new Date(row.cells[0].textContent); // Assuming date is in the first column
-            const amountCell = parseFloat(row.cells[5].textContent); // Assuming amount is in the sixth column
+                // Check if only one date field is filled
+                if (fromDate && !toDate) {
+                    for (let i = 2; i < rows.length; i++) {
+                        const row = rows[i];
+                        const dateCell = new Date(row.cells[0].textContent); // Assuming date is in the first column
+                        const amountCell = parseFloat(row.cells[5].textContent); // Assuming amount is in the sixth column
 
-            // Set the time component of dateCell to the end of the day
-            dateCell.setHours(23, 59, 59, 999);
+                        // Set the time component of dateCell to the end of the day
+                        dateCell.setHours(23, 59, 59, 999);
 
-            if (fromDate <= dateCell) {
-                count = count + 1;
-                totalAmount += amountCell;
-                row.style.display = 'table-row';
-            } else {
-                row.style.display = 'none';
-            }
-        }
-    } else if (fromDate && toDate) {
-        // Both fromDate and toDate are filled
-        for (let i = 2; i < rows.length; i++) {
-            const row = rows[i];
-            const dateCell = new Date(row.cells[0].textContent); // Assuming date is in the first column
-            const amountCell = parseFloat(row.cells[5].textContent); // Assuming amount is in the sixth column
+                        if (fromDate <= dateCell) {
+                            count = count + 1;
+                            totalAmount += amountCell;
+                            row.style.display = 'table-row';
+                        } else {
+                            row.style.display = 'none';
+                        }
+                    }
+                } else if (fromDate && toDate) {
+                    // Both fromDate and toDate are filled
+                    for (let i = 2; i < rows.length; i++) {
+                        const row = rows[i];
+                        const dateCell = new Date(row.cells[0].textContent); // Assuming date is in the first column
+                        const amountCell = parseFloat(row.cells[5].textContent); // Assuming amount is in the sixth column
 
-            // Set the time component of dateCell to the end of the day
-            dateCell.setHours(23, 59, 59, 999);
+                        // Set the time component of dateCell to the end of the day
+                        dateCell.setHours(23, 59, 59, 999);
 
-            if (fromDate <= dateCell && dateCell <= toDate) {
-                count = count + 1;
-                totalAmount += amountCell;
-                row.style.display = 'table-row';
-            } else {
-                row.style.display = 'none';
-            }
-        }
-    } else {
-        // Both fromDate and toDate are not filled, show the entire table
-        for (let i = 2; i < rows.length; i++) {
-            const row = rows[i];
-            row.style.display = 'table-row';
-        }
-    }
-
+                        if (fromDate <= dateCell && dateCell <= toDate) {
+                            count = count + 1;
+                            totalAmount += amountCell;
+                            row.style.display = 'table-row';
+                        } else {
+                            row.style.display = 'none';
+                        }
+                    }
+                } else {
+                    // Both fromDate and toDate are not filled, show the entire table
+                    for (let i = 2; i < rows.length; i++) {
+                        const row = rows[i];
+                        row.style.display = 'table-row';
+                    }
+                }
                     // Update the count and total amount in HTML
                     document.getElementById('countDisplay').textContent = count;
-                    document.getElementById('amountDisplay').textContent = totalAmount.toFixed(2);
+                    document.getElementById('totalAmountDisplay').textContent = totalAmount.toFixed(2); // Displaying total amount with 2 decimal places
+                    
                 }
+
+
+
+
 
     </script>
 
     <script type="text/javascript">
-        $(document).ready(function ($) {
+       $(document).ready(function ($) {
 
 $(document).on('click', '.btn_print', function (event) {
     console.log('print1');
     event.preventDefault();
 
 
-    const pdfCard = document.getElementById('myTable').cloneNode(true);
+    const pdfCard = document.getElementById('pdf-card').cloneNode(true);
 
     // Create a new window for printing
     const printWindow = window.open('', '');
     pdfCard.style.color = 'black';
-    pdfCard.style.backgroundColor = 'white';
+    pdfCard.style.backgroundColor = '#243e54';
     const pageTitle = printWindow.document.createElement('h1');
-    pageTitle.textContent = 'PURCHASE ORDER DETAILS'; // Replace 'Page Title' with your desired title text
+    pageTitle.textContent = 'RECURRING BILL REPORTS'; // Replace 'Page Title' with your desired title text
     pageTitle.style.textAlign = 'center';
     pageTitle.style.color = 'black';
 
@@ -423,7 +465,6 @@ $(document).on('click', '.btn_print', function (event) {
     }
     const table = printWindow.document.querySelector('#pdf-card table'); // Adjust the selector based on your table structure
     if (table) {
-        table.style.width = '100%';
         table.style.margin = 'auto';
     }
 
@@ -433,12 +474,12 @@ $(document).on('click', '.btn_print', function (event) {
     // Close the new window after printing
     printWindow.close();
 
-});
 
 });
 
-
+});
     </script>
+
     <script type="text/javascript">
         function exportAsExcel() {
             const table = document.getElementById('myTable'); // Replace 'myTable' with your table's ID
@@ -460,39 +501,35 @@ $(document).on('click', '.btn_print', function (event) {
                     style="background-color: rgba(0, 0, 0, 0.2);" id="myTable">
                     <thead>
                         <tr>
-                            <th colspan="6" style="text-align: center;">Purchase Order Details</th>
+                            <th colspan="6" style="text-align: center;">Purchase Order By Vendor</th>
                             </th>
                         </tr>
                         <tr>
-                            <th style="text-align: center;">Date</th>
-                            <th style="text-align: center;">Number </th>
-                            <th style="text-align: center;">Due Date</th>
                             <th style="text-align: center;">Vendor Name</th>
-                            <th style="text-align: center;">Status</th>
-                            <th style="text-align: center;">Amount</th>
+                            <th style="text-align: center;">Mail ID </th>
+                            <th style="text-align: center;">Purchase Order Count(Total Count)</th>
+                            <th style="text-align: center;">Amount( Total Amount)</th>
+                            
 
                         </tr>
                     </thead>
                     <tbody>
-                        {% for i in details %}
+                        {% for v in vendordetails %}
                         <tr class="text-center">
-                            <td>{{i.date}}</td>
-                            <td>{{i.puchaseorder_no}}</td>
-                            <td>{{i.due_date}}</td>
-                            <td>{{i.vendor_name}}</td>
-                            <td>{% if i.status == 'Billed' %}Converted to Bill{% else %} Not converted to Bill {% endif %}</td>
-                            <td>{{i.grand_total}}</td>
+                            
+                            <td>{{v.vendor_name}}</td>
+                            <td>{{v.vendor_mail}}</td>
+                            <td>{{v.number_of_orders}}</td>
+                            <td>{{v.total_amount}}</td>                            
                         </tr>
                         {% endfor %}
                         
                     </tbody>
-                   
                 </table>
                 <div>
                     <span style="font-weight: 600;">Total Count :</span> <label id="countDisplay">{{defaultCount}}</label> <br>
-                    <span style="font-weight: 600;">Total Amount:</span> <label id="amountDisplay">{{defaultAmount}}</label>
+                    <span style="font-weight: 600;">Total Amount:</span> <label id="totalAmountDisplay">{{defaultAmount}}</label>
                 </div>
-                
                 <br>
 
             </div>
