@@ -51486,6 +51486,51 @@ def recurringBillDetailsToEmail(request):
                 messages.error(request, f'Error while sending report: {e}')
                 return redirect('recurring_bill_report')
 
+def recurringBillDetailsToEmail(request):
+        if request.user:
+            try:
+                if request.method == 'POST':
+                    fromdate = request.POST['FromD']
+                    todate = request.POST['ToD']
+                    emails_string = request.POST['email_ids']
+                    if fromdate == '' and todate == '' :
+                        data = recurring_bill.objects.filter(cid_id=request.user.id)
+                    else:
+                        data = recurring_bill.objects.filter(cid_id=request.user.id,start_date__gte=fromdate, start_date__lte=todate)
+                        
+
+                    # Split the string by commas and remove any leading or trailing whitespace
+                    emails_list = [email.strip() for email in emails_string.split(',')]
+                    email_message = request.POST['email_message']
+                    
+                    cmp = company.objects.get(id_id=request.user.id)
+                    
+
+                    context = {'cmp': cmp, 'data': data, 'email_message': email_message}
+                    print('context working')
+                    template_path = 'app1/recurring_bill_report_pdf.html'
+                    print('tpath working')
+                    template = get_template(template_path)
+                    print('template working')
+                    html = template.render(context)
+                    print('html working')
+                    result = BytesIO()
+                    print('bytes working')
+                    pdf = pisa.pisaDocument(BytesIO(html.encode("ISO-8859-1")), result)
+                    print('pisa working')
+
+                    if pdf.err:
+                        raise Exception(f"PDF generation error: {pdf.err}")
+
+                    pdf = result.getvalue()
+                    print('')
+                    filename = f'recurring_bill_report-{cmp.cname}.pdf'
+                    
+                    messages.success(request, 'Report has been shared via email successfully..!')
+                    return redirect('recurring_bill_report')
+            except Exception as e:
+                messages.error(request, f'Error while sending report: {e}')
+                return redirect('recurring_bill_report')
 
 def purchaseOrderByVendorToEmail(request):
     if request.user:

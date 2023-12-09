@@ -6,29 +6,12 @@
 <!-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> -->
 <script src="https://cdn.emailjs.com/dist/email.min.js"></script>
 
-<!-- Add this link in the head of your HTML document -->
-<link rel="stylesheet" type="text/css" media="print" href="path/to/print-styles.css">
 
 
 <!-- Include jQuery.table2excel plugin -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.4/xlsx.full.min.js"></script>
 
 <style>
-    @media print {
-    body {
-        width: 100%;
-        margin: 0;
-    }
-    
-    table {
-        width: 100%;
-    }
-}
-
-tr {
-    page-break-inside: avoid;
-}
-
     #ui-datepicker-div {
         width: 20rem;
         left: 632px;
@@ -402,7 +385,7 @@ function exportAsPDF() {
 
     </script>
 
-<!-- <script>
+<script>
     function printTable() {
     const tableToPrint = document.getElementById('myTable').cloneNode(true);
 
@@ -411,14 +394,10 @@ function exportAsPDF() {
     const textElements = tableToPrint.querySelectorAll('th, td');
     textElements.forEach(element => {
         element.style.color = 'black';
-        element.style.backgroundColor = 'white'; // Set background color to white
     });
 
     // Create a new window for printing
     const printWindow = window.open('', '_blank');
-
-    // Set the background color of the entire document
-    printWindow.document.body.style.backgroundColor = 'white';
 
     // Append the modified table to the new window's body
     printWindow.document.body.appendChild(tableToPrint);
@@ -430,8 +409,7 @@ function exportAsPDF() {
     printWindow.close();
 }
 
-
-</script> -->
+</script>
 
 
 
@@ -507,28 +485,28 @@ $(document).on('click', '.btn_print', function (event) {
 
     <div class="card radius-15 print-only" id="pdf-card">
         <div class="card-body">
-            <div class="container-fluid" id="">
+            <div class="container-fluid">
 
                 <table class="table table-responsive-md mt-4 table-hover table-bordered"
                     style="background-color: rgba(0, 0, 0, 0.2);" id="myTable">
                     <thead>
                         <tr>
-                            <th colspan="6" style="text-align: center;">Purchase Order By Vendor</th>
+                            <th colspan="6" style="text-align: center;">Purchase Order Details</th>
                             </th>
                         </tr>
-                        <tr >
-                            <th style="text-align: center;"  >Date</th>
-                            <th style="text-align: center;"  >Number </th>
-                            <th style="text-align: center;"  >Due Date</th>
-                            <th style="text-align: center;"  >Vendor Name</th>
-                            <th style="text-align: center;"  >Status</th>
-                            <th style="text-align: center;"  >Amount</th>
+                        <tr>
+                            <th style="text-align: center;">Date</th>
+                            <th style="text-align: center;">Number </th>
+                            <th style="text-align: center;">Due Date</th>
+                            <th style="text-align: center;">Vendor Name</th>
+                            <th style="text-align: center;">Status</th>
+                            <th style="text-align: center;">Amount</th>
 
                         </tr>
                     </thead>
                     <tbody>
                         {% for i in details %}
-                        <tr class="text-center" >
+                        <tr class="text-center">
                             <td>{{i.date}}</td>
                             <td>{{i.puchaseorder_no}}</td>
                             <td>{{i.due_date}}</td>
@@ -541,7 +519,6 @@ $(document).on('click', '.btn_print', function (event) {
                     </tbody>
                    
                 </table>
-                </center>
                 <div>
                     <span style="font-weight: 600;">Total Count :</span> <label id="countDisplay">{{defaultCount}}</label> <br>
                     <span style="font-weight: 600;">Total Amount:</span> <label id="amountDisplay">{{defaultAmount}}</label>
@@ -556,61 +533,7 @@ $(document).on('click', '.btn_print', function (event) {
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
 
 
-<script>
-    function printTable() {
-    // Clone the table element
-    const tableToPrint = document.getElementById('myTable').cloneNode(true);
 
-    // Set background color and text color for printing
-    tableToPrint.style.backgroundColor = 'white';
-    const textElements = tableToPrint.querySelectorAll('th, td');
-    
-    // Set a common width for all columns
-    const columnWidth = 100 / tableToPrint.rows[0].cells.length + '%';
-    
-    // Iterate over the columns and set the width for each cell
-    for (let i = 0; i < tableToPrint.rows.length; i++) {
-        const cells = tableToPrint.rows[i].cells;
-        for (let j = 0; j < cells.length; j++) {
-            cells[j].style.width = '17%';
-            cells[j].style.color = 'black';
-            cells[j].style.backgroundColor = 'white';
-            cells[j].style.border = '1px solid black';
-            cells[j].style.fontSize = '20px';
-        }
-    }
-
-    // Create a new window for printing
-    const printWindow = window.open('', '_blank');
-
-    // Set the background color and styles for centering
-    printWindow.document.body.style.backgroundColor = 'white';
-    printWindow.document.body.style.margin = '0'; // Remove default margin
-    // printWindow.document.body.style.display = 'flex';
-    printWindow.document.body.style.justifyContent = 'center';
-
-    // Set the width of the table to 100%
-    tableToPrint.style.width = '100%';
-
-    // Append the modified table to the new window's body
-    printWindow.document.body.appendChild(tableToPrint);
-
-    // Trigger the print dialog for the new window
-    printWindow.print();
-
-    // Close the new window after printing
-    printWindow.close();
-}
-
-
-
-
-
-
-
-
-
-</script>
 
 
 
@@ -638,6 +561,5 @@ $(document).on('click', '.btn_print', function (event) {
 
 
 </script>
-
 {% endif %}
 {% endblock %}

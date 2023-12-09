@@ -132,7 +132,7 @@
                 <div class="right ml-auto" >
 
                     <button class="btn btn_pdf btn-outline-info" onclick="exportAsPDF()" >pdf</button>
-                    <button class="btn btn_print btn-outline-info" onclick="printTable()">Print</button>
+                    <button class="btn btn_print btn-outline-info">Print</button>
                     <button class=" btn btn-outline-info" id="export-button" onclick="exportAsExcel()">Excel</button>
                     <button class="btn btn-outline-info dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         Share
@@ -188,70 +188,6 @@
         </div>
     </div>
     <script>
-        function exportAsPDF() {
-    const container = document.getElementById('pdf-card');
-
-    // Save the original background color
-    const originalBackgroundColor = container.style.backgroundColor;
-
-    // Set the container's background color to white
-    container.style.backgroundColor = 'white';
-
-    // Apply styling changes to the container's content
-    const textWhiteElements = container.querySelectorAll('.text');
-    textWhiteElements.forEach(element => {
-        element.style.color = 'black'; // Set text color to black
-    });
-
-    const tableElements = container.querySelectorAll('table');
-    const tableCells = container.querySelectorAll('td, th');
-    const tableRows = container.querySelectorAll('tr');
-
-    tableElements.forEach(table => {
-        table.style.backgroundColor = '#ffffff'; // Set background color to white
-        table.style.color = '#000000'; // Set text color to black
-    });
-
-    tableCells.forEach(cell => {
-        cell.style.backgroundColor = '#ffffff'; // Set background color to white
-        cell.style.color = '#000000'; // Set text color to black
-        cell.style.border = '1px solid black'; // Add a black border
-    });
-
-    tableRows.forEach(row => {
-        row.style.backgroundColor = '#000000'; // Set background color to black
-    });
-
-    const pdfOptions = {
-        margin: 0,
-        filename: '{{cmp1.cname}}_Recurring_Bill_Details.pdf',
-        image: { type: 'jpeg', quality: 1 },
-        html2canvas: { scale: 2 },
-        jsPDF: { unit: 'mm', format: 'a3', orientation: 'portrait' }, // Adjust format and orientation
-    };
-
-    // Generate PDF from the container
-    html2pdf().from(container).set(pdfOptions).save().then(() => {
-
-        // Restore the original background color
-        container.style.backgroundColor = '#243e54';
-
-        textWhiteElements.forEach(element => {
-            element.style.color = 'white'; // Restore original text color
-        });
-
-        tableCells.forEach(cell => {
-            cell.style.backgroundColor = '#243e54'; // Set background color to white
-            cell.style.color = 'white'; // Set text color to black
-            cell.style.border = '1px solid gray'; // Add a black border
-        });
-
-        // Remove the pdf-background class after generating the PDF
-        container.classList.remove('pdf-background');
-        
-    });
-}
-
 
 
 function shareViaWhatsApp() {
@@ -337,68 +273,68 @@ function shareViaWhatsApp() {
 
 
              
-//                 function exportAsPDF() {
-//     const container = document.getElementById('pdf-card');
+                function exportAsPDF() {
+    const container = document.getElementById('pdf-card');
 
-//     // Save the original background color
-//     const originalBackgroundColor = container.style.backgroundColor;
+    // Save the original background color
+    const originalBackgroundColor = container.style.backgroundColor;
 
-//     // Set the container's background color to white
-//     container.style.backgroundColor = 'white';
+    // Set the container's background color to white
+    container.style.backgroundColor = 'white';
 
-//     // Apply styling changes to the container's content
-//     const textWhiteElements = container.querySelectorAll('.text');
-//     textWhiteElements.forEach(element => {
-//         element.style.color = 'black'; // Set text color to black
-//     });
+    // Apply styling changes to the container's content
+    const textWhiteElements = container.querySelectorAll('.text');
+    textWhiteElements.forEach(element => {
+        element.style.color = 'black'; // Set text color to black
+    });
 
-//     const tableElements = container.querySelectorAll('table');
-//     const tableCells = container.querySelectorAll('td, th');
-//     const tableRows = container.querySelectorAll('tr');
+    const tableElements = container.querySelectorAll('table');
+    const tableCells = container.querySelectorAll('td, th');
+    const tableRows = container.querySelectorAll('tr');
 
-//     tableElements.forEach(table => {
-//         table.style.backgroundColor = '#ffffff'; // Set background color to white
-//         table.style.color = '#000000'; // Set text color to black
-//     });
+    tableElements.forEach(table => {
+        table.style.backgroundColor = '#ffffff'; // Set background color to white
+        table.style.color = '#000000'; // Set text color to black
+    });
 
-//     tableCells.forEach(cell => {
-//         cell.style.backgroundColor = '#ffffff'; // Set background color to white
-//         cell.style.color = '#000000'; // Set text color to black
-//         cell.style.border = '1px solid black'; // Add a black border
-//     });
+    tableCells.forEach(cell => {
+        cell.style.backgroundColor = '#ffffff'; // Set background color to white
+        cell.style.color = '#000000'; // Set text color to black
+        cell.style.border = '1px solid black'; // Add a black border
+    });
 
-//     tableRows.forEach(row => {
-//         row.style.backgroundColor = '#000000'; // Set background color to black
-//     });
+    tableRows.forEach(row => {
+        row.style.backgroundColor = '#000000'; // Set background color to black
+    });
 
-//     const pdfOptions = {
-//         margin: 0,
-//         filename: '{{cmp1.cname}}_Recurring_Bill_Details.pdf',
-//         image: { type: 'jpeg', quality: 1 },
-//         html2canvas: { scale: 2 },
-//         jsPDF: { unit: 'mm', format: 'a3', orientation: 'portrait' }, // Adjust format and orientation
-//     };
+    const pdfOptions = {
+        margin: 0,
+        filename: '{{cmp1.cname}}_Recurring_Bill_Details.pdf',
+        image: { type: 'jpeg', quality: 1 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: 'mm', format: 'a3', orientation: 'portrait' }, // Adjust format and orientation
+    };
 
-//     // Generate PDF from the container
-//     html2pdf().from(container).set(pdfOptions).save().then(() => {
+    // Generate PDF from the container
+    html2pdf().from(container).set(pdfOptions).save().then(() => {
 
-//         // Restore the original background color
-//         container.style.backgroundColor = '#243e54';
+        // Restore the original background color
+        container.style.backgroundColor = '#243e54';
 
-//         textWhiteElements.forEach(element => {
-//             element.style.color = 'white'; // Restore original text color
-//         });
+        textWhiteElements.forEach(element => {
+            element.style.color = 'white'; // Restore original text color
+        });
 
-//         tableCells.forEach(cell => {
-//         cell.style.backgroundColor = '#243e54'; // Set background color to white
-//         cell.style.color = 'white'; // Set text color to black
-//         cell.style.border = '1px solid gray'; // Add a black border
-//     });
-//         // Remove the pdf-background class after generating the PDF
-//         container.classList.remove('pdf-background');
+        tableCells.forEach(cell => {
+        cell.style.backgroundColor = '#243e54'; // Set background color to white
+        cell.style.color = 'white'; // Set text color to black
+        cell.style.border = '1px solid gray'; // Add a black border
+    });
+        // Remove the pdf-background class after generating the PDF
+        container.classList.remove('pdf-background');
         
-//     });
-// }
+    });
+}
 
 
 
@@ -435,7 +371,7 @@ function shareViaWhatsApp() {
     
     </script>
 
-    <!-- <script type="text/javascript">
+    <script type="text/javascript">
 
         $(document).ready(function ($) {
 
@@ -488,9 +424,7 @@ function shareViaWhatsApp() {
             });
 
         });
-    </script> -->
-
-
+    </script>
     <script type="text/javascript">
         function exportAsExcel() {
             const table = document.getElementById('myTable'); // Replace 'myTable' with your table's ID
@@ -665,144 +599,6 @@ function filterTable() {
         var options = { year: 'numeric', month: 'long', day: 'numeric' };
         document.getElementById("d2").innerHTML = "  To  " + tdate.toLocaleDateString(undefined, options);
     })
-
-//     function printTable() {
-//     const tableToPrint = document.getElementById('myTable').cloneNode(true);
-
-//     // Set background color and text color for printing
-//     style.backgroundColor = 'white'
-//     tableToPrint.style.backgroundColor = 'white';
-//     const textElements = tableToPrint.querySelectorAll('th, td');
-//     textElements.forEach(element => {
-//         element.style.color = 'black';
-//     });
-
-//     // Create a new window for printing
-//     const printWindow = window.open('', '_blank');
-
-//     // Append the modified table to the new window's body
-//     printWindow.document.body.appendChild(tableToPrint);
-
-//     // Trigger the print dialog for the new window
-//     printWindow.print();
-
-//     // Close the new window after printing
-//     printWindow.close();
-// }
-
-function exportAsPDF() {
-    const container = document.getElementById('pdf-card');
-
-    // Save the original background color
-    const originalBackgroundColor = container.style.backgroundColor;
-
-    // Set the container's background color to white
-    container.style.backgroundColor = 'white';
-
-    // Apply styling changes to the container's content
-    const textWhiteElements = container.querySelectorAll('.text');
-    textWhiteElements.forEach(element => {
-        element.style.color = 'black'; // Set text color to black
-    });
-
-    const tableElements = container.querySelectorAll('table');
-    const tableCells = container.querySelectorAll('td, th');
-    const tableRows = container.querySelectorAll('tr');
-
-    tableElements.forEach(table => {
-        table.style.backgroundColor = '#ffffff'; // Set background color to white
-        table.style.color = '#000000'; // Set text color to black
-    });
-
-    tableCells.forEach(cell => {
-        cell.style.backgroundColor = '#ffffff'; // Set background color to white
-        cell.style.color = '#000000'; // Set text color to black
-        cell.style.border = '1px solid black'; // Add a black border
-    });
-
-    tableRows.forEach(row => {
-        row.style.backgroundColor = '#000000'; // Set background color to black
-    });
-
-    const pdfOptions = {
-        margin: 0,
-        filename: '{{cmp1.cname}}_Recurring_Bill_Details.pdf',
-        image: { type: 'jpeg', quality: 1 },
-        html2canvas: { scale: 2 },
-        jsPDF: { unit: 'mm', format: 'a3', orientation: 'portrait' }, // Adjust format and orientation
-    };
-
-    // Generate PDF from the container
-    html2pdf().from(container).set(pdfOptions).save().then(() => {
-
-        // Restore the original background color
-        container.style.backgroundColor = '#243e54';
-
-        textWhiteElements.forEach(element => {
-            element.style.color = 'white'; // Restore original text color
-        });
-
-        tableCells.forEach(cell => {
-        cell.style.backgroundColor = '#243e54'; // Set background color to white
-        cell.style.color = 'white'; // Set text color to black
-        cell.style.border = '1px solid gray'; // Add a black border
-    });
-        // Remove the pdf-background class after generating the PDF
-        container.classList.remove('pdf-background');
-        
-    });
-}
-
-
-
-    function printTable() {
-        // Clone the table element
-        const tableToPrint = document.getElementById('myTable').cloneNode(true);
-
-        // Set background color and text color for printing
-        tableToPrint.style.backgroundColor = 'white';
-        const textElements = tableToPrint.querySelectorAll('th, td');
-        
-        // Set a common width for all columns
-        const columnWidth = 100 / tableToPrint.rows[0].cells.length + '%';
-        
-        // Iterate over the columns and set the width for each cell
-        for (let i = 0; i < tableToPrint.rows.length; i++) {
-            const cells = tableToPrint.rows[i].cells;
-            for (let j = 0; j < cells.length; j++) {
-                cells[j].style.width = '14%';
-                // cells[j].style.height = '2px';
-                cells[j].style.color = 'black';
-                cells[j].style.backgroundColor = 'white';
-                cells[j].style.border = '1px solid black';
-                cells[j].style.fontSize = '20px';
-            }
-        }
-
-        // Create a new window for printing
-        const printWindow = window.open('', '_blank');
-
-        // Set the background color and styles for centering
-        printWindow.document.body.style.backgroundColor = 'white';
-        printWindow.document.body.style.margin = '0'; // Remove default margin
-        // printWindow.document.body.style.display = 'flex';
-        printWindow.document.body.style.justifyContent = 'center';
-
-        // Set the width of the table to 100%
-        tableToPrint.style.width = '100%';
-
-        // Append the modified table to the new window's body
-        printWindow.document.body.appendChild(tableToPrint);
-
-        // Trigger the print dialog for the new window
-        printWindow.print();
-
-        // Close the new window after printing
-        printWindow.close();
-    }
-
-
-
 
 
 </script>
