@@ -34463,14 +34463,15 @@ def createpurchaseorder(request):
             shipping_charge=request.POST['shipcharge']
             paid_amount=request.POST['paid']
             payment_type=request.POST['paytype']  
-            balance_amount=int(grand_total)-int(paid_amount)
+            balance_amount = float(grand_total) - float(paid_amount)
             cheque_number = request.POST['chequeNumber']
             upi_number = request.POST['upiNumber']
             account_number = request.POST['accountNumber']
             save_type = request.POST.get('save_type')
 
-            if save_type == 'draft':
-                porder = purchaseorder(vendor_name=vname,vendor_mail=vendor_mail,billing_address=baddress,
+            try:
+                with transaction.atomic():
+                    porder = purchaseorder(vendor_name=vname,vendor_mail=vendor_mail,billing_address=baddress,
                                     sourceofsupply=supply,vendor_gsttype=vgsttype,vendor_gstin=vgstin,
                                     destiofsupply=destsupply,branch=branch,reference=reference,puchaseorder_no=puchaseorder_no,
                                     contact_name=contact_name,deliverto=deliverto,customer_gsttype=cgsttype,customer_gstin=cgstin,
@@ -34479,47 +34480,41 @@ def createpurchaseorder(request):
                                     cgst=cgst,igst=igst,tax_amount=tax_amount,tcs=tcs,tcs_amount=tcs_amount,round_off=round_off,
                                     grand_total=grand_total,balance_due=balance_due,note=note,cid=cmp1,
                                     total_discount=total_discount,ship_charge=shipping_charge,paid_amount=paid_amount,balance_amount=balance_amount,
-                                    payment_type=payment_type,status='Draft')
+                                    payment_type=payment_type,status='Draft' if save_type == 'draft' else 'Save')
             
-            elif save_type == 'save':
-                porder = purchaseorder(vendor_name=vname,vendor_mail=vendor_mail,billing_address=baddress,
-                                    sourceofsupply=supply,vendor_gsttype=vgsttype,vendor_gstin=vgstin,
-                                    destiofsupply=destsupply,branch=branch,reference=reference,puchaseorder_no=puchaseorder_no,
-                                    contact_name=contact_name,deliverto=deliverto,customer_gsttype=cgsttype,customer_gstin=cgstin,
-                                    date=date,cheque_number=cheque_number,upi_number=upi_number,account_number=account_number,
-                                    credit_period=credit_period,due_date=due_date,sub_total=sub_total,discount=discount,sgst=sgst,
-                                    cgst=cgst,igst=igst,tax_amount=tax_amount,tcs=tcs,tcs_amount=tcs_amount,round_off=round_off,
-                                    grand_total=grand_total,balance_due=balance_due,note=note,cid=cmp1,
-                                    total_discount=total_discount,ship_charge=shipping_charge,paid_amount=paid_amount,balance_amount=balance_amount,
-                                    payment_type=payment_type,status='Save')
-
-            porder.save()
-
-            if len(request.FILES) != 0:
-                porder.file=request.FILES['file'] 
-
-            porder.save()
-            # porder.puchaseorder_no = int(porder.puchaseorder_no) + porder.porderid
-            # porder.save()
-            pordr = purchaseorder.objects.get(porderid=porder.porderid)
-
-            items = request.POST.getlist("items[]")
-            hsn = request.POST.getlist("hsn[]")
-            quantity = request.POST.getlist("quantity[]")
-            rate = request.POST.getlist("rate[]")
-            tax = request.POST.getlist("tax[]")
-            amount = request.POST.getlist("amount[]")
-            discount = request.POST.getlist("reduce[]")
             
-            prid=purchaseorder.objects.get(porderid=porder.porderid)
+                    porder.save()
 
-            if len(items)==len(hsn)==len(quantity)==len(rate)==len(tax)==len(amount)==len(discount):
-                
-                mapped=zip(items,hsn,quantity,rate,tax,amount,discount)
-                mapped=list(mapped)
-                for ele in mapped:
-                    porderAdd,created = purchaseorder_item.objects.get_or_create(items = ele[0],hsn = ele[1],quantity=ele[2],rate=ele[3],
-                    tax=ele[4],amount=ele[5],discount=ele[6],porder=prid,cid=cmp1)
+                    if len(request.FILES) != 0:
+                        porder.file=request.FILES['file'] 
+
+                    porder.save()
+
+                    pordr = purchaseorder.objects.get(porderid=porder.porderid)
+
+                    items = request.POST.getlist("items[]")
+                    hsn = request.POST.getlist("hsn[]")
+                    quantity = request.POST.getlist("quantity[]")
+                    rate = request.POST.getlist("rate[]")
+                    tax = request.POST.getlist("tax[]")
+                    amount = request.POST.getlist("amount[]")
+                    discount = request.POST.getlist("reduce[]")
+                    prid=purchaseorder.objects.get(porderid=porder.porderid)
+                    # print(items)
+                    # print(hsn)
+                    # print(quantity)
+                    # print(rate)
+                    # print(tax)
+                    # print(amount)
+                    # print(discount)
+
+                    if len(items)==len(hsn)==len(quantity)==len(rate)==len(tax)==len(amount)==len(discount):
+
+                        mapped=zip(items,hsn,quantity,rate,tax,amount,discount)
+                        mapped=list(mapped)
+                        for ele in mapped:
+                            porderAdd,created = purchaseorder_item.objects.get_or_create(items = ele[0],hsn = ele[1],quantity=ele[2],rate=ele[3],
+                            tax=ele[4],amount=ele[5],discount=ele[6],porder=prid,cid=cmp1)
 
                     # itemqty = itemtable.objects.get(name=ele[0],cid=cmp1)
                     # if itemqty.stock != 0:
@@ -34530,9 +34525,17 @@ def createpurchaseorder(request):
                     #     itemqty.stock =temp
                     #     itemqty.save()
 
+            
+            except Exception as e:
+                # Handle exceptions if any part of the transaction fails
+                print(str(e))
+                return render(request, 'app1/gopurchaseorder.html', {'cmp1': cmp1, 'error': True})
+
             return redirect('gopurchaseorder')
-        return render(request,'app1/gopurchaseorder.html',{'cmp1': cmp1})
-    return redirect('/') 
+
+        return render(request, 'app1/gopurchaseorder.html', {'cmp1': cmp1})
+
+    return redirect('/')
 
 @login_required(login_url='regcomp')
 def viewpurchaseorder(request,id):
@@ -51411,19 +51414,21 @@ def purchase_order_details(request):
     defaultCount = purchaseorder.objects.filter(cid_id = request.user.id).count()
     defaultAmount=0
     for i in details:
-        defaultAmount += int(i.grand_total)
+        defaultAmount += float(i.grand_total)
+    # return render(request,'app1/purchase_order_details.html',{'details':details,'cmp1':cmp1,'defaultCount':defaultCount})
     return render(request,'app1/purchase_order_details.html',{'details':details,'cmp1':cmp1,'defaultCount':defaultCount,'defaultAmount':defaultAmount})
 
 def purchase_orderby_vendor(request):
     cmp1 = company.objects.get(id=request.user)
     vendr = vendor.objects.filter(cid_id = request.user.id)
     # vendordetails = purchaseorder.objects.values('vendor_name').distinct()
-    vendordetails = purchaseorder.objects.filter(cid_id=request.user.id).values('vendor_name','vendor_mail').annotate(number_of_orders=Count('vendor_balance'),total_amount=Sum('grand_total'))
+    vendordetails = purchaseorder.objects.filter(cid_id=request.user.id).values('vendor_name','vendor_mail').annotate(number_of_orders=Count('cid'),total_amount=Sum('grand_total'))
     defaultCount = purchaseorder.objects.filter(cid_id=request.user.id).count()
     purchaseamount = purchaseorder.objects.filter(cid_id=request.user.id)
     defaultAmount = 0
     for i in purchaseamount:
-        defaultAmount += int(i.grand_total)
+        defaultAmount += float(i.grand_total)
+    # return render(request, 'app1/purchase_orderby_vendor.html', {'vendordetails': vendordetails,'vendor':vendr,'cmp1':cmp1,'defaultCount':defaultCount})
     return render(request, 'app1/purchase_orderby_vendor.html', {'vendordetails': vendordetails,'vendor':vendr,'cmp1':cmp1,'defaultCount':defaultCount,'defaultAmount':defaultAmount})
 
 def recurring_bill_report(request):
